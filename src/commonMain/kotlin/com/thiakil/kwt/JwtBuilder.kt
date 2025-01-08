@@ -277,12 +277,6 @@ public class JwtSignatureBuilder(
     @SerialName("crit")
     public override var critical: List<String>? = null
 
-    @JwtDSL
-    public suspend fun fromKeyProvider(keyId: String? = null, provider: KeyProvider){
-        this.keyId = keyId
-        this.key = provider(keyId)!!
-    }
-
     internal fun build(): String {
         val header = JOSEHeaderData(
             type = this.type,

@@ -18,13 +18,13 @@ class TestECDSA {
         assertTrue(ES256.verify(jwt.signature!!, JavaECKey(ecKey.toJavaPublic())))
 
         //re-sign it with the same key and test it passes verification
-        val signed = runBlocking { JWS.sign(jwt.payload, ES256, {ecKey}) }
+        val signed = runBlocking { JWS.sign(jwt.payload, ES256, ecKey) }
         val reDecoded = JWT.decode(signed)
         assertNotNull(reDecoded.signature)
         assertTrue(ES256.verify(reDecoded.signature!!, ecKey))
 
         //re-sign it with the same key and test it passes verification
-        val signedNative = runBlocking { JWS.sign(jwt.payload, ES256, {JavaECKey(null, ecKey.toJavaPrivate())}) }
+        val signedNative = runBlocking { JWS.sign(jwt.payload, ES256, JavaECKey(null, ecKey.toJavaPrivate())) }
         val reDecodedNative = JWT.decode(signedNative)
         assertNotNull(reDecodedNative.signature)
         assertTrue(ES256.verify(reDecodedNative.signature!!, ecKey))

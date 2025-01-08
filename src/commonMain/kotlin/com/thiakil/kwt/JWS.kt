@@ -55,11 +55,15 @@ public object JWS {
 
     /**
      * Verify the signature of a JWT using JWS
+     * @param jwt the decoded JWT from [JWT.decode]
+     * @param signingKey the expected signing key, use [DecodedJWT.header] members for hints if needed
+     * @param noneIsValid whether to accept a token without a signature
+     *
      * @throws UnsupportedJWAlgorithm When an algorithm is unknown or isn't supported by the underlying platform
      * @throws UnsupportedKeyException When a key is malformed or not applicable to the alorithm
      * @throws InvalidSignatureException When a signature is malformed or otherwise invalid
      */
-    public suspend fun verify(jwt: DecodedJWT, keyProvider: KeyProvider, noneIsValid: Boolean = true): Boolean {
+    public fun verify(jwt: DecodedJWT, signingKey: SigningKey, noneIsValid: Boolean = true): Boolean {
         val algorithm = jwt.header.algorithm
         if (algorithm == "none") {
             return noneIsValid && (jwt.signature == null || jwt.signature.signature.isEmpty())
@@ -68,18 +72,17 @@ public object JWS {
             return false
         }
         val verifier = com.thiakil.kwt.JWS_ALGORITHMS[algorithm] ?: throw UnsupportedJWAlgorithm(algorithm)
-        val signingKey = keyProvider(jwt.header.keyId) ?: return false
         return verifier.verify(jwt.signature, signingKey)
     }
 
-    public suspend fun sign(payload: JWTPayload, algorithm: JwsAlgorithm, keyProvider: KeyProvider, keyId: String? = null): String {
+    public suspend fun sign(payload: JWTPayload, algorithm: JwsAlgorithm, signingKey: SigningKey, keyId: String? = null): String {
         val header = JOSEHeaderData(
             type = "jwt",
             algorithm = algorithm.jwaId,
             keyId = keyId
         )
         val toSign = payload.serialise(header)
-        return "${toSign}." + algorithm.sign(toSign, keyProvider(keyId)!!)
+        return "${toSign}." + algorithm.sign(toSign, signingKey)
     }
 }
 
@@ -100,14 +103,6 @@ public interface JwsAlgorithm {
  * Either a deserialized JWK or a platform dependant native key.
  */
 public interface SigningKey
-
-/**
- * Get a signing key using the keyId from the JOSE header as a hint.
- *
- * @param keyId The key id contained in a JOSE header, where available
- * @return the key to verify with, or null when no applicable key found
- */
-public typealias KeyProvider = suspend (keyId: String?) -> SigningKey?
 
 /**
  * Thrown by a [JwsAlgorithm] when the key supplied cannot by used by the algorithm.

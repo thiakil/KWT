@@ -39,13 +39,13 @@ class TestRSA {
         val jwk = JsonWebKey.format.decodeFromString<JsonWebKey>(testJWK)
         assertTrue(jwk is JsonWebKey.RSA)
         assertTrue(jwk.isValidPrivateKey)
-        val signed = runBlocking { JWS.sign(baseToken, RS256, { jwk }) }
+        val signed = runBlocking { JWS.sign(baseToken, RS256, jwk) }
         assertTrue(RS256.verify(JWT.decode(signed).signature!!, jwk))
     }
 
     @Test
     fun testSignAndVerify(){
-        val signed = runBlocking { JWS.sign(baseToken, RS256, { JavaRSAKey(privateKey = privateKey) }) }
+        val signed = runBlocking { JWS.sign(baseToken, RS256, JavaRSAKey(privateKey = privateKey)) }
         assertTrue(RS256.verify(JWT.decode(signed).signature!!, JavaRSAKey(publicKey)))
     }
 

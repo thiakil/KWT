@@ -35,7 +35,7 @@ class TestRSAPSS {
 
     @Test
     fun testSignAndVerify(){
-        val signed = runBlocking { JWS.sign(baseToken, PS256, { JavaRSAKey(privateKey = getPrivateKey()) }) }
+        val signed = runBlocking { JWS.sign(baseToken, PS256, JavaRSAKey(privateKey = getPrivateKey())) }
         assertTrue(PS256.verify(JWT.decode(signed).signature!!, JavaRSAKey(getPublicKey())))
     }
 
