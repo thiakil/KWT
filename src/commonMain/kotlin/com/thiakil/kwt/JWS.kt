@@ -49,7 +49,7 @@ public object JWS {
     public fun supports(algorithm: String): Boolean {
         return when(algorithm) {
             "none" -> true
-            else -> com.thiakil.kwt.JWS_ALGORITHMS.containsKey(algorithm)
+            else -> JWS_ALGORITHMS.containsKey(algorithm)
         }
     }
 
@@ -71,7 +71,7 @@ public object JWS {
         if (jwt.signature == null) {
             return false
         }
-        val verifier = com.thiakil.kwt.JWS_ALGORITHMS[algorithm] ?: throw UnsupportedJWAlgorithm(algorithm)
+        val verifier = JWS_ALGORITHMS[algorithm] ?: throw UnsupportedJWAlgorithm(algorithm)
         return verifier.verify(jwt.signature, signingKey)
     }
 
