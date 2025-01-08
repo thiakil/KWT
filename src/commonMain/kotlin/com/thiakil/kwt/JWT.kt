@@ -3,6 +3,7 @@ package com.thiakil.kwt
 import com.thiakil.kwt.helpers.decodeBase64UrlBytes
 import com.thiakil.kwt.helpers.decodeBase64UrlString
 import com.thiakil.kwt.helpers.encodeBase64Url
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.*
 import kotlinx.serialization.modules.*
 
@@ -26,9 +27,11 @@ public object JWT {
             defaultDeserializer { JOSEHeaderData.serializer() }
         }
     }
+    @OptIn(ExperimentalSerializationApi::class)
     internal val json: Json = Json {
         ignoreUnknownKeys = true
         serializersModule = serialModule
+        classDiscriminatorMode = ClassDiscriminatorMode.NONE
     }
 
 
