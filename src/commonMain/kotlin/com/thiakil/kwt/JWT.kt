@@ -83,7 +83,7 @@ public class JWSDecodeException(message: String, cause: Exception? = null): Runt
 public data class DecodedJWT(public val header: JOSEHeader, public val payload: JWTPayload, public val signature: UnverifiedSignature?)
 
 public data class JWTPayload(
-    public val claimsSet: JWTClaimsSet,
+    internal val claimsSet: JWTClaimsSet,
     public val unknownClaims: Map<String, JsonElement> = emptyMap()
 ) : JWTClaimsSet by claimsSet {
 

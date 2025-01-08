@@ -15,8 +15,8 @@ class TestJwt {
         val decoded = JWT.decode(basicEncodedJWT)
         assertEquals("HS256", decoded.header.algorithm, "Header parse failed")
         assertEquals("JWT", decoded.header.type, "Header parse failed")
-        assertEquals("joe", decoded.payload.claimsSet.issuer)
-        assertEquals(GMTDate(1300819380L * 1000), decoded.payload.claimsSet.expiresAt)
+        assertEquals("joe", decoded.payload.issuer)
+        assertEquals(GMTDate(1300819380L * 1000), decoded.payload.expiresAt)
         assertTrue(decoded.payload.unknownClaims.containsKey("http://example.com/is_root"))
         val isRoot = decoded.payload.unknownClaims["http://example.com/is_root"]
         assertTrue(isRoot is JsonPrimitive)
@@ -28,7 +28,7 @@ class TestJwt {
         val decoded = JWT.decode("eyJhbGciOiJub25lIn0." +
             "eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.")
         assertEquals("none", decoded.header.algorithm)
-        assertEquals("joe", decoded.payload.claimsSet.issuer)
+        assertEquals("joe", decoded.payload.issuer)
         assertNull(decoded.signature)
     }
 }
