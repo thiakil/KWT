@@ -8,7 +8,7 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 
-private val jsonFormat = Json {  }
+private val jsonFormat = Json
 
 @JwtDSL
 @Serializable

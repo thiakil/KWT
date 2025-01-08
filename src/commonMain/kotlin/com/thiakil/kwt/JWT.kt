@@ -16,17 +16,17 @@ public object JWT {
         polymorphic(JWTClaimsSet::class) {
             subclass(JWTClaimsSetData::class)
             subclass(JwtBuilder::class)
-            default { JWTClaimsSetData.serializer() }
+            defaultDeserializer { JWTClaimsSetData.serializer() }
         }
         polymorphic(JWTClaimsSet.Address::class){
             subclass(JWTClaimsSetData.Address::class)
             subclass(JwtBuilder.Address::class)
-            default { JWTClaimsSetData.Address.serializer() }
+            defaultDeserializer { JWTClaimsSetData.Address.serializer() }
         }
         polymorphic(JOSEHeader::class) {
             subclass(JOSEHeaderData::class)
             subclass(JwtSignatureBuilder::class)
-            default { JOSEHeaderData.serializer() }
+            defaultDeserializer { JOSEHeaderData.serializer() }
         }
     }
     internal val json: Json = Json {

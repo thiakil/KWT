@@ -75,7 +75,7 @@ public object JWS {
         return verifier.verify(jwt.signature, signingKey)
     }
 
-    public suspend fun sign(payload: JWTPayload, algorithm: JwsAlgorithm, signingKey: SigningKey, keyId: String? = null): String {
+    public fun sign(payload: JWTPayload, algorithm: JwsAlgorithm, signingKey: SigningKey, keyId: String? = null): String {
         val header = JOSEHeaderData(
             type = "jwt",
             algorithm = algorithm.jwaId,

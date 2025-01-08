@@ -14,6 +14,9 @@ val serialization_version: String by project.extra
 val ktor_version: String by project.extra
 
 kotlin {
+    applyDefaultHierarchyTemplate()
+    explicitApi()
+
     jvm()
     //js() {
     //    nodejs()
