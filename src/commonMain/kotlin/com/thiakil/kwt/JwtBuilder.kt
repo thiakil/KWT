@@ -242,6 +242,7 @@ public class JwtSignatureBuilder(
 
     @SerialName("alg")
     @EncodeDefault
+    @Required
     public override var algorithm: String = "none"
 
     @JwtDSL

@@ -31,6 +31,7 @@ public interface JOSEHeader {
      * present and MUST be understood and processed by implementations.
      */
     @SerialName("alg")
+    @Required
     public val algorithm: String
 
     /**

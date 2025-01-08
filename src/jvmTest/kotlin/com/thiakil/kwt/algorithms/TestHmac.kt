@@ -16,7 +16,7 @@ class TestHmac {
             JWT.decode("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2MDgzMDE3MTh9.0fw6h3xOPG_Ptqy7Wt-wIi8TX4H6d9p2hi5radQGojU")
         assertEquals(HS256.jwaId, token.header.algorithm)
         val correctKey = HmacStringKey("test")
-        assertTrue(JWS.verify(token, correctKey))
+        assertEquals(HS256.jwaId, token.header.algorithm)
         assertTrue(HS256.verify(token.signature!!, correctKey))
         assertFalse(HS256.verify(token.signature!!, HmacStringKey("not-the-right-key")))
     }

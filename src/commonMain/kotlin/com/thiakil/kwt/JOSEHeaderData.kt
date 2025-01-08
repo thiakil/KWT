@@ -15,6 +15,7 @@ public data class JOSEHeaderData(
     override val type: String? = "JWT",
 
     @SerialName("alg")
+    @Required
     override val algorithm: String,
 
     @SerialName("jku")

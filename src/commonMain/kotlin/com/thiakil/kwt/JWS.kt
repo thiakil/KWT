@@ -48,28 +48,6 @@ public object JWS {
         }
     }
 
-    /**
-     * Verify the signature of a JWT using JWS
-     * @param jwt the decoded JWT from [JWT.decode]
-     * @param signingKey the expected signing key, use [DecodedJWT.header] members for hints if needed
-     * @param noneIsValid whether to accept a token without a signature
-     *
-     * @throws UnsupportedJWAlgorithm When an algorithm is unknown or isn't supported by the underlying platform
-     * @throws UnsupportedKeyException When a key is malformed or not applicable to the alorithm
-     * @throws InvalidSignatureException When a signature is malformed or otherwise invalid
-     */
-    public fun verify(jwt: DecodedJWT, signingKey: SigningKey, noneIsValid: Boolean = true): Boolean {
-        val algorithm = jwt.header.algorithm
-        if (algorithm == "none") {
-            return noneIsValid && (jwt.signature == null || jwt.signature.signature.isEmpty())
-        }
-        if (jwt.signature == null) {
-            return false
-        }
-        val verifier = JWS_ALGORITHMS[algorithm] ?: throw UnsupportedJWAlgorithm(algorithm)
-        return verifier.verify(jwt.signature, signingKey)
-    }
-
     public fun sign(payload: JWTPayload, algorithm: JwsAlgorithm, signingKey: SigningKey, keyId: String? = null): String {
         val header = JOSEHeaderData(
             type = "jwt",
@@ -84,8 +62,6 @@ public object JWS {
 internal expect val JWS_ALGORITHMS: Map<String, JwsAlgorithm>
 
 public sealed class JwsException(override val message: String, cause: Exception?=null): Exception(message, cause)
-
-public class UnsupportedJWAlgorithm(algorithm: String): JwsException("Unsupported algorithm: $algorithm")
 
 public interface JwsAlgorithm {
     public val jwaId: String
