@@ -27,6 +27,16 @@ class TestHmac {
     }
 
     @Test
+    fun testHS256SignDSL() {
+        val hmackey = HmacStringKey("test")
+        val signed = baseToken.signSync {
+            alg = HS256
+            key = hmackey
+        }
+        assertTrue(HS256.verify(JWT.decode(signed).signature!!, hmackey))
+    }
+
+    @Test
     fun testSignVerifyLoop() {
         AlgorithmHelper.testSelfSignVerify(baseToken, HS256, HmacByteKey(byteArrayOf(1,2,3,4,5,6)))
         AlgorithmHelper.testSelfSignVerify(baseToken, HS384, HmacByteKey(byteArrayOf(1,2,3,4,5,6)))
