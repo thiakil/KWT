@@ -32,6 +32,9 @@ internal object ListOrStringSerializer : JsonTransformingSerializer<List<String>
     // If response is not an array, then it is a single object that should be wrapped into the array
     override fun transformDeserialize(element: JsonElement): JsonElement =
         if (element !is JsonArray) JsonArray(listOf(element)) else element
+
+    override fun transformSerialize(element: JsonElement): JsonElement =
+        if (element is JsonArray && element.size == 1) element[0] else element
 }
 
 internal object Base64UrlBinary: KSerializer<ByteArray> {
