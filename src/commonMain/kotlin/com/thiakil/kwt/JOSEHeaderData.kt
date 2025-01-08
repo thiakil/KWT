@@ -7,10 +7,12 @@ import kotlinx.serialization.*
 /**
  * Data class impl of [JOSEHeader]
  */
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 public data class JOSEHeaderData(
     @SerialName("typ")
-    override val type: String? = null,
+    @EncodeDefault
+    override val type: String? = "JWT",
 
     @SerialName("alg")
     override val algorithm: String,

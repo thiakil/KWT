@@ -219,6 +219,7 @@ public fun makeJWT(block: JwtBuilder.()->Unit): JWTPayload = JwtBuilder().apply(
 
 @JwtDSL
 @Serializable
+@OptIn(ExperimentalSerializationApi::class)
 public class JwtSignatureBuilder(
     @Transient
     private val payload: JWTPayload = JWTPayload(JWTClaimsSetData())
@@ -235,15 +236,21 @@ public class JwtSignatureBuilder(
         }
 
     @SerialName("typ")
+    @EncodeDefault
     @JwtDSL
-    public override var type: String? = null
+    public override var type: String? = "JWT"
 
     @SerialName("alg")
-    public override val algorithm: String get() = alg.jwaId
+    @EncodeDefault
+    public override var algorithm: String = "none"
 
     @JwtDSL
     @Transient
     public var alg: JwsAlgorithm = None
+        set(value) {
+        algorithm = value.jwaId
+        field = value
+    }
 
     @JwtDSL
     @SerialName("jku")
@@ -278,18 +285,7 @@ public class JwtSignatureBuilder(
     public override var critical: List<String>? = null
 
     internal fun build(): String {
-        val header = JOSEHeaderData(
-            type = this.type,
-            algorithm = this.algorithm,
-            jwkSetUrl = this.jwkSetUrl,
-            jsonWebKey = this.jsonWebKey,
-            keyId = this.keyId,
-            x509Url = this.x509Url,
-            x509CertChain = this.x509CertChain,
-            contentType = this.contentType,
-            critical = this.critical,
-        )
-        val toSign = payload.serialise(header)
+        val toSign = payload.serialise(this)
         return "${toSign}." + alg.sign(toSign, key)
     }
 
