@@ -1,11 +1,8 @@
-
-
 package com.thiakil.kwt
 
 import com.thiakil.kwt.helpers.decodeBase64UrlBytes
 import com.thiakil.kwt.helpers.decodeBase64UrlString
 import com.thiakil.kwt.helpers.encodeBase64Url
-import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import kotlinx.serialization.modules.*
 
@@ -35,7 +32,6 @@ public object JWT {
     }
 
 
-    @OptIn(ExperimentalSerializationApi::class)
     private val knownClaims:Set<String> = mutableSetOf<String>().also {
         val claimsSerialiser = JWTClaimsSetData.serializer()
         val numElements = claimsSerialiser.descriptor.elementsCount
