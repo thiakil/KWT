@@ -6,7 +6,7 @@ import kotlin.test.*
 
 object AlgorithmHelper {
     fun testSelfSignVerify(jwt: JWTPayload, algorithm: JwsAlgorithm, keyIn: SigningKey) {
-        val signed = jwt.signSync {
+        val signed = jwt.sign {
             key = keyIn
             alg = algorithm
         }

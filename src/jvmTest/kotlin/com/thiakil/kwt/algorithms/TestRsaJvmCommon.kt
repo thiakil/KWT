@@ -62,14 +62,14 @@ class TestRsaJvmCommon {
         val nativeKey = JavaRSAKey(keyPair)
 
         //test signing via native and verifying by jwk
-        val jvmSigned = baseToken.signSync {
+        val jvmSigned = baseToken.sign {
             key = nativeKey
             alg = RS256
         }
         assert(RS256.verify(JWT.decode(jvmSigned).signature!!, newJwk))
 
         //test signing via JWK and verifying via native
-        val jwkSigned = baseToken.signSync {
+        val jwkSigned = baseToken.sign {
             key = newJwk
             alg = RS256
         }

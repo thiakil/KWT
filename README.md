@@ -48,7 +48,7 @@ val token: String = makeJWT {
     issuer = "test-issuer"
     singleAudience = "test"
     subject = "test testerton"
-}.signSync {
+}.sign {
     alg = HS256
     key = hmacKey
 }

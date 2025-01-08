@@ -31,7 +31,7 @@ class TestHmac {
     @Test
     fun testHS256SignDSL() {
         val hmackey = HmacStringKey("test")
-        val signed = baseToken.signSync {
+        val signed = baseToken.sign {
             alg = HS256
             key = hmackey
         }
