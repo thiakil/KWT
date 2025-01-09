@@ -3,9 +3,6 @@
 package com.thiakil.kwt.algorithms
 
 import com.thiakil.kwt.*
-import com.thiakil.kwt.algorithms.*
-import kotlinx.coroutines.*
-import kotlinx.serialization.*
 import kotlin.test.*
 
 class TestECDSA {
@@ -18,13 +15,21 @@ class TestECDSA {
         assertTrue(ES256.verify(jwt.signature!!, JavaECKey(ecKey.toJavaPublic())))
 
         //re-sign it with the same key and test it passes verification
-        val signed = JWS.sign(jwt.payload, JWS.Id.ES256, ecKey)
+        val signed = jwt.payload.sign {
+            type = "jwt"
+            algorithm = JWS.Id.ES256
+            key = ecKey
+        }
         val reDecoded = JWT.decode(signed)
         assertNotNull(reDecoded.signature)
         assertTrue(ES256.verify(reDecoded.signature!!, ecKey))
 
         //re-sign it with the same key and test it passes verification
-        val signedNative = JWS.sign(jwt.payload, JWS.Id.ES256, JavaECKey(null, ecKey.toJavaPrivate()))
+        val signedNative = jwt.payload.sign {
+            type = "jwt"
+            algorithm = JWS.Id.ES256
+            key = JavaECKey(null, ecKey.toJavaPrivate())
+        }
         val reDecodedNative = JWT.decode(signedNative)
         assertNotNull(reDecodedNative.signature)
         assertTrue(ES256.verify(reDecodedNative.signature!!, ecKey))

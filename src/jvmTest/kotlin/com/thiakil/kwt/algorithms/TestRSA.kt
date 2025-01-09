@@ -4,8 +4,6 @@ package com.thiakil.kwt.algorithms
 
 import com.thiakil.kwt.*
 import io.ktor.util.*
-import kotlinx.coroutines.*
-import kotlinx.serialization.*
 import java.security.*
 import java.security.interfaces.*
 import java.security.spec.*
@@ -35,17 +33,25 @@ class TestRSA {
     }
 
     @Test
-    fun testSignWithJwk(){
+    fun testSignWithJwk() {
         val jwk = JsonWebKey.format.decodeFromString<JsonWebKey>(testJWK)
         assertTrue(jwk is JsonWebKey.RSA)
         assertTrue(jwk.isValidPrivateKey)
-        val signed = JWS.sign(baseToken, JWS.Id.RS256, jwk)
+        val signed = baseToken.sign {
+            type = "jwt"
+            algorithm = JWS.Id.RS256
+            key = jwk
+        }
         assertTrue(RS256.verify(JWT.decode(signed).signature!!, jwk))
     }
 
     @Test
-    fun testSignAndVerify(){
-        val signed = JWS.sign(baseToken, JWS.Id.RS256, JavaRSAKey(privateKey = privateKey))
+    fun testSignAndVerify() {
+        val signed = baseToken.sign {
+            type = "jwt"
+            algorithm = JWS.Id.RS256
+            key = JavaRSAKey(privateKey = privateKey)
+        }
         assertTrue(RS256.verify(JWT.decode(signed).signature!!, JavaRSAKey(publicKey)))
     }
 

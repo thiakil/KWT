@@ -241,16 +241,16 @@ public class JwtSignatureBuilder(
 
     @SerialName("alg")
     @EncodeDefault
+    @JwtDSL
     @Required
     public override var algorithm: JWS.Id = JWS.Id.NONE
 
-    @JwtDSL
-    @Transient
-    public var alg: JwsAlgorithm = None
+    //testing only
+    internal var alg: JwsAlgorithm
         set(value) {
-        algorithm = value.jwaId
-        field = value
-    }
+            algorithm = value.jwaId
+        }
+        get() = JWS[algorithm]
 
     @JwtDSL
     @SerialName("jku")
@@ -284,15 +284,15 @@ public class JwtSignatureBuilder(
     @SerialName("crit")
     public override var critical: List<String>? = null
 
-    internal fun build(): String {
+    public fun build(): String {
         val toSign = payload.serialise(this)
-        return "${toSign}." + alg.sign(toSign, key)
+        return "${toSign}." + JWS[algorithm].sign(toSign, key)
     }
 
     private object NoSigningKey: SigningKey
 }
 
 @JwtDSL
-public fun JWTPayload.sign(block: JwtSignatureBuilder.()->Unit): String {
+public inline fun JWTPayload.sign(crossinline block: JwtSignatureBuilder.()->Unit): String {
     return JwtSignatureBuilder(this).apply(block).build()
 }

@@ -3,8 +3,6 @@
 package com.thiakil.kwt.algorithms
 
 import com.thiakil.kwt.*
-import com.thiakil.kwt.algorithms.*
-import kotlinx.coroutines.*
 import kotlin.test.*
 
 
@@ -24,7 +22,11 @@ class TestHmac {
     @Test
     fun testHS256Sign() {
         val key = HmacStringKey("test")
-        val signed =  JWS.sign(baseToken, JWS.Id.HS256, key )
+        val signed = baseToken.sign {
+            type = "jwt"
+            algorithm = JWS.Id.HS256
+            this.key = key
+        }
         assertTrue(HS256.verify(JWT.decode(signed).signature!!, key))
     }
 

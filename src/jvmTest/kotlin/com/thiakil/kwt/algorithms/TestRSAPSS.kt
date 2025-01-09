@@ -4,8 +4,6 @@ package com.thiakil.kwt.algorithms
 
 import com.thiakil.kwt.*
 import io.ktor.util.*
-import kotlinx.coroutines.*
-import kotlinx.serialization.*
 import java.security.*
 import java.security.interfaces.*
 import java.security.spec.*
@@ -34,8 +32,12 @@ class TestRSAPSS {
     }
 
     @Test
-    fun testSignAndVerify(){
-        val signed = JWS.sign(baseToken, JWS.Id.PS256, JavaRSAKey(privateKey = getPrivateKey()))
+    fun testSignAndVerify() {
+        val signed = baseToken.sign {
+            type = "jwt"
+            algorithm = JWS.Id.PS256
+            key = JavaRSAKey(privateKey = getPrivateKey())
+        }
         assertTrue(PS256.verify(JWT.decode(signed).signature!!, JavaRSAKey(getPublicKey())))
     }
 

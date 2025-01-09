@@ -77,15 +77,6 @@ public object JWS {
         }
     }
 
-    public fun sign(payload: JWTPayload, algorithm: Id, signingKey: SigningKey, keyId: String? = null): String {
-        val header = JOSEHeaderData(
-            type = "jwt",
-            algorithm = algorithm,
-            keyId = keyId
-        )
-        val toSign = payload.serialise(header)
-        return "${toSign}." + get(algorithm).sign(toSign, signingKey)
-    }
 }
 
 internal expect val JWS_ALGORITHMS: Map<JWS.Id, JwsAlgorithm>
