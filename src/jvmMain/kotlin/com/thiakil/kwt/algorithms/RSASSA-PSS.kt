@@ -25,7 +25,7 @@ private val SHAType.saltLen get() = when(this) {
     SHAType.SHA512 -> 64
 }
 
-public sealed class RsassPssBase(override val jwaId: String, alg: SHAType): JwsAlgorithm {
+public sealed class RsassPssBase(override val jwaId: JWS.Id, alg: SHAType): JwsAlgorithm {
     private val pssParameterSpec = PSSParameterSpec(alg.mdName, "MGF1", alg.mfgSpec, alg.saltLen, 1)
 
     override fun verify(signature: UnverifiedSignature, key: SigningKey): Boolean {
@@ -55,6 +55,6 @@ public sealed class RsassPssBase(override val jwaId: String, alg: SHAType): JwsA
     }
 }
 
-public object PS256: RsassPssBase("PS256", SHAType.SHA256)
-public object PS384: RsassPssBase("PS384", SHAType.SHA384)
-public object PS512: RsassPssBase("PS512", SHAType.SHA512)
+public object PS256: RsassPssBase(JWS.Id.PS256, SHAType.SHA256)
+public object PS384: RsassPssBase(JWS.Id.PS384, SHAType.SHA384)
+public object PS512: RsassPssBase(JWS.Id.PS512, SHAType.SHA512)

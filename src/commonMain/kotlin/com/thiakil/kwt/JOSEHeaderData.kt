@@ -16,7 +16,7 @@ public data class JOSEHeaderData(
 
     @SerialName("alg")
     @Required
-    override val algorithm: String,
+    override val algorithm: JWS.Id,
 
     @SerialName("jku")
     override val jwkSetUrl: String? = null,

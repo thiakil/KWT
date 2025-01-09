@@ -10,6 +10,7 @@ object AlgorithmHelper {
             key = keyIn
             alg = algorithm
         }
+        println("${algorithm.jwaId}: $signed")
         val decodedJWT = JWT.decode(signed)
         assertEquals(algorithm.jwaId, decodedJWT.header.algorithm)
         assertTrue(algorithm.verify(decodedJWT.signature!!, keyIn))

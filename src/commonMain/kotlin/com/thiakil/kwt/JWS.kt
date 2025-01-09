@@ -1,5 +1,10 @@
 package com.thiakil.kwt
 
+import com.thiakil.kwt.algorithms.None
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import java.lang.RuntimeException
+
 /**
  * RFC 7518 - 3.1.  "alg" (Algorithm) Header Parameter Values for JWS
  *
@@ -38,33 +43,57 @@ package com.thiakil.kwt
  * version of the specification.
  */
 public object JWS {
+    @Serializable
+    public enum class Id {
+        HS256,
+        HS384,
+        HS512,
+        RS256,
+        RS384,
+        RS512,
+        ES256,
+        ES384,
+        ES512,
+        PS256,
+        PS384,
+        PS512,
+        @SerialName("none")
+        NONE
+    }
     /**
      * Check if this platform supports this algorithm for signing and verifying
      */
-    public fun supports(algorithm: String): Boolean {
+    public fun supports(algorithm: Id): Boolean {
         return when(algorithm) {
-            "none" -> true
+            Id.NONE -> true
             else -> JWS_ALGORITHMS.containsKey(algorithm)
         }
     }
 
-    public fun sign(payload: JWTPayload, algorithm: JwsAlgorithm, signingKey: SigningKey, keyId: String? = null): String {
+    public operator fun get(algorithm: Id): JwsAlgorithm {
+        return when(algorithm) {
+            Id.NONE -> None
+            else -> JWS_ALGORITHMS[algorithm] ?: throw UnsupportedJWSAlgorithm(algorithm)
+        }
+    }
+
+    public fun sign(payload: JWTPayload, algorithm: Id, signingKey: SigningKey, keyId: String? = null): String {
         val header = JOSEHeaderData(
             type = "jwt",
-            algorithm = algorithm.jwaId,
+            algorithm = algorithm,
             keyId = keyId
         )
         val toSign = payload.serialise(header)
-        return "${toSign}." + algorithm.sign(toSign, signingKey)
+        return "${toSign}." + get(algorithm).sign(toSign, signingKey)
     }
 }
 
-internal expect val JWS_ALGORITHMS: Map<String, JwsAlgorithm>
+internal expect val JWS_ALGORITHMS: Map<JWS.Id, JwsAlgorithm>
 
-public sealed class JwsException(override val message: String, cause: Exception?=null): Exception(message, cause)
+public sealed class JwsException(override val message: String, cause: Exception?=null): RuntimeException(message, cause)
 
 public interface JwsAlgorithm {
-    public val jwaId: String
+    public val jwaId: JWS.Id
     public fun verify(signature: UnverifiedSignature, key: SigningKey): Boolean
     public fun sign(payload: String, key: SigningKey): String
 }
@@ -82,3 +111,5 @@ public class UnsupportedKeyException(message: String, cause: Exception? = null):
 
 /** Thrown when a signature doesn't match the algorithm's expected format */
 public class InvalidSignatureException(message: String, cause: Exception? = null): JwsException(message, cause)
+
+public class UnsupportedJWSAlgorithm(algorithm: JWS.Id): JwsException("Unsupported algorithm: $algorithm")

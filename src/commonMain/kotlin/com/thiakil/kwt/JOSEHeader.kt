@@ -32,7 +32,7 @@ public interface JOSEHeader {
      */
     @SerialName("alg")
     @Required
-    public val algorithm: String
+    public val algorithm: JWS.Id
 
     /**
      * The "jku" (JWK Set URL) Header Parameter is a URI (RFC3986) that refers to a resource for a set of JSON-encoded

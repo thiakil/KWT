@@ -63,7 +63,8 @@ public object JWT {
         } catch (e: Exception) {
             throw JWSDecodeException("Header deserialisation failed: ${e.message}", e)
         }
-        if (header.algorithm != "none" && parts.size != 3) throw JWSDecodeException("missing signature")
+        //technically it should still have a third part, but it will be an empty string
+        if (header.algorithm != JWS.Id.NONE && parts.size != 3) throw JWSDecodeException("missing signature")
         val payloadRaw = json.parseToJsonElement(parts[1].decodeBase64UrlString())
         val payload = json.decodeFromJsonElement<JWTClaimsSetData>(payloadRaw)
         val payloadUnknowns = payloadRaw.jsonObject.toMutableMap()

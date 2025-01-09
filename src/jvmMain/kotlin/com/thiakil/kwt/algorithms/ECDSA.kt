@@ -48,7 +48,7 @@ internal fun JsonWebKey.EllipticCurve.toJavaPrivate(): ECPrivateKey {
 
 public data class JavaECKey(val publicKey: ECPublicKey? = null, val privateKey: ECPrivateKey? = null): SigningKey
 
-public sealed class EcdsaBase(override val jwaId: String, shaType: SHAType): JwsAlgorithm {
+public sealed class EcdsaBase(override val jwaId: JWS.Id, shaType: SHAType): JwsAlgorithm {
     /** Size (in bytes) of the R,S integers. Equal to the size of the key */
     private val rsSize: Int = when(shaType) {
         SHAType.SHA256 -> 32
@@ -209,6 +209,6 @@ public sealed class EcdsaBase(override val jwaId: String, shaType: SHAType): Jws
     }
 }
 
-public object ES256: EcdsaBase("ES256", SHAType.SHA256)
-public object ES384: EcdsaBase("ES384", SHAType.SHA384)
-public object ES512: EcdsaBase("ES512", SHAType.SHA512)
+public object ES256: EcdsaBase(JWS.Id.ES256, SHAType.SHA256)
+public object ES384: EcdsaBase(JWS.Id.ES384, SHAType.SHA384)
+public object ES512: EcdsaBase(JWS.Id.ES512, SHAType.SHA512)

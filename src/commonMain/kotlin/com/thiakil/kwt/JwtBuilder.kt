@@ -4,7 +4,6 @@ package com.thiakil.kwt
 
 import com.thiakil.kwt.algorithms.*
 import io.ktor.util.date.*
-import kotlinx.coroutines.*
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 
@@ -243,7 +242,7 @@ public class JwtSignatureBuilder(
     @SerialName("alg")
     @EncodeDefault
     @Required
-    public override var algorithm: String = "none"
+    public override var algorithm: JWS.Id = JWS.Id.NONE
 
     @JwtDSL
     @Transient
