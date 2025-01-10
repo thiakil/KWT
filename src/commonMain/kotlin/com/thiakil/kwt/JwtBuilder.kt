@@ -226,7 +226,7 @@ public class JwtSignatureBuilder(
 
     @JwtDSL
     @Transient
-    public var key: SigningKey = NoSigningKey
+    public var key: SigningKey = SigningKey.NONE
         set(value) {
             field = value
             if (keyId == null && value is JsonWebKey && value.keyId != null){
@@ -285,11 +285,8 @@ public class JwtSignatureBuilder(
     public override var critical: List<String>? = null
 
     public fun build(): String {
-        val toSign = payload.serialise(this)
-        return "${toSign}." + JWS[algorithm].sign(toSign, key)
+        return payload.sign(this, key)
     }
-
-    private object NoSigningKey: SigningKey
 }
 
 @JwtDSL

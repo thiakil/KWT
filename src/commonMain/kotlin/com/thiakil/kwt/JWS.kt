@@ -93,7 +93,9 @@ public interface JwsAlgorithm {
  * Marker interface for a crypto key which can be used for signing/signature-verification.
  * Either a deserialized JWK or a platform dependant native key.
  */
-public interface SigningKey
+public interface SigningKey {
+    public object NONE: SigningKey
+}
 
 /**
  * Thrown by a [JwsAlgorithm] when the key supplied cannot by used by the algorithm.

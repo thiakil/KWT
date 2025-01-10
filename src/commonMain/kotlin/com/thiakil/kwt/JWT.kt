@@ -16,7 +16,7 @@ public object JWT {
             subclass(JwtBuilder::class)
             defaultDeserializer { JWTClaimsSetData.serializer() }
         }
-        polymorphic(JWTClaimsSet.Address::class){
+        polymorphic(JWTClaimsSet.Address::class) {
             subclass(JWTClaimsSetData.Address::class)
             subclass(JwtBuilder.Address::class)
             defaultDeserializer { JWTClaimsSetData.Address.serializer() }
@@ -27,6 +27,7 @@ public object JWT {
             defaultDeserializer { JOSEHeaderData.serializer() }
         }
     }
+
     @OptIn(ExperimentalSerializationApi::class)
     internal val json: Json = Json {
         ignoreUnknownKeys = true
@@ -35,7 +36,7 @@ public object JWT {
     }
 
 
-    private val knownClaims:Set<String> = mutableSetOf<String>().also {
+    private val knownClaims: Set<String> = mutableSetOf<String>().also {
         val claimsSerialiser = JWTClaimsSetData.serializer()
         val numElements = claimsSerialiser.descriptor.elementsCount
         for (i in 0 until numElements) {
@@ -73,28 +74,54 @@ public object JWT {
         return DecodedJWT(
             header = header,
             payload = JWTPayload(payload, payloadUnknowns),
-            signature = signature?.let { UnverifiedSignature(parts[0]+"."+parts[1], it) }
+            signature = signature?.let { UnverifiedSignature(parts[0] + "." + parts[1], it) }
         )
     }
 }
 
-public class JWSDecodeException(message: String, cause: Exception? = null): RuntimeException(message, cause)
+public class JWSDecodeException(message: String, cause: Exception? = null) : RuntimeException(message, cause)
 
-public data class DecodedJWT(public val header: JOSEHeader, public val payload: JWTPayload, public val signature: UnverifiedSignature?)
+public data class DecodedJWT(
+    public val header: JOSEHeader,
+    public val payload: JWTPayload,
+    public val signature: UnverifiedSignature?
+)
 
 public data class JWTPayload(
     internal val claimsSet: JWTClaimsSet,
     public val unknownClaims: Map<String, JsonElement> = emptyMap()
 ) : JWTClaimsSet by claimsSet {
 
-    public fun serialise(
-        header: JOSEHeader
-    ): String {
-        val fields = mutableMapOf<String,JsonElement>()
+    private fun JOSEHeader.serialise(): String = JWT.json.encodeToString(this).encodeBase64Url()
+
+    private fun serialise(): String {
+        val payloadJson = JWT.json.encodeToString(JsonObject(getFields()))
+        return payloadJson.encodeBase64Url()
+    }
+
+    internal fun getFields(): Map<String, JsonElement> {
+        val fields = mutableMapOf<String, JsonElement>()
         fields.putAll(JWT.json.encodeToJsonElement(this.claimsSet).jsonObject)
         fields.putAll(JWT.json.encodeToJsonElement(this.unknownClaims).jsonObject)
-        val payloadJson = JWT.json.encodeToString(JsonObject(fields))
-        return (JWT.json.encodeToString(header).encodeBase64Url())+ "." + (payloadJson.encodeBase64Url())
+        return fields
+    }
+
+    /**
+     * Serialise & sign the payload with the specified algorithm and key.
+     */
+    public fun sign(header: JOSEHeader, algorithm: JwsAlgorithm, signingKey: SigningKey): String {
+        if (header.algorithm != algorithm.jwaId) {
+            throw IllegalArgumentException("Header algorithm mismatch")
+        }
+        val toSign = header.serialise() + "." + serialise()
+        return "${toSign}." + algorithm.sign(toSign, signingKey)
+    }
+
+    /**
+     * Serialise & sign the payload with the specified key. Algorithm is looked up from the header
+     */
+    public fun sign(header: JOSEHeader, signingKey: SigningKey): String {
+        return sign(header, JWS[header.algorithm], signingKey)
     }
 }
 

@@ -3,6 +3,7 @@
 package com.thiakil.kwt
 
 import com.thiakil.kwt.*
+import com.thiakil.kwt.algorithms.None
 import io.ktor.util.date.*
 import kotlinx.serialization.json.*
 import kotlin.test.*
@@ -30,5 +31,19 @@ class TestJwt {
         assertEquals(JWS.Id.NONE, decoded.header.algorithm)
         assertEquals("joe", decoded.payload.issuer)
         assertNull(decoded.signature)
+    }
+
+    @Test
+    fun signLoopUnsigned() {
+        AlgorithmHelper.testSelfSignVerify(
+            makeJWT {
+                issuer = "example.com"
+                singleAudience = "example"
+                givenName = "Test"
+                familyName = "Testerton"
+            },
+            None,
+            SigningKey.NONE
+        )
     }
 }
