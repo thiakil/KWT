@@ -1,13 +1,12 @@
-
-
 package com.thiakil.kwt
 
-import kotlinx.serialization.*
+import kotlinx.serialization.Serializable
 
 @Serializable
-public class JsonWebKeySet(public val keys: List<JsonWebKey>): List<JsonWebKey> by keys {
+public data class JsonWebKeySet(public val keys: List<JsonWebKey>) : List<JsonWebKey> by keys {
+    public fun serialize(): String = JsonWebKey.format.encodeToString(this)
 
     public companion object {
-        public fun decodeFromString(jwkSet: String): JsonWebKeySet = JsonWebKey.format.decodeFromString(jwkSet)
+        public fun deserialize(jwkSet: String): JsonWebKeySet = JsonWebKey.format.decodeFromString(jwkSet)
     }
 }

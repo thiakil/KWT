@@ -1,11 +1,20 @@
-
-
 package com.thiakil.kwt
 
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
-import kotlin.contracts.*
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.ClassDiscriminatorMode
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonContentPolymorphicSerializer
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.modules.SerializersModule
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 public sealed class JsonWebKey: SigningKey {
     /**
@@ -24,8 +33,9 @@ public sealed class JsonWebKey: SigningKey {
      * used for those key types.  Members used with specific "kty" values
      * can be found in the IANA "JSON Web Key Parameters" registry
      */
-    //@SerialName("kty")
-    //public val keyType: String
+    @SerialName("kty")
+    @EncodeDefault
+    public abstract val keyType: String
 
     /**
      * The "use" (public key use) parameter identifies the intended use of
@@ -292,6 +302,10 @@ public sealed class JsonWebKey: SigningKey {
         @Serializable(with = Base64UrlBinary::class)
         public val eccPrivateKey: ByteArray? = null,
     ): JsonWebKey() {
+        @SerialName("kty")
+        @EncodeDefault
+        override val keyType: String = "EC"
+
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (other !is EllipticCurve) return false
@@ -319,7 +333,6 @@ public sealed class JsonWebKey: SigningKey {
     }
 
     @Serializable
-    @SerialName("RSA")
     public data class RSA(
         @SerialName("use") override val use: String? = null,
         @SerialName("key_ops") override val keyOperations: Set<String>? = null,
@@ -436,6 +449,10 @@ public sealed class JsonWebKey: SigningKey {
         public val otherPrimesInfo: List<OtherPrimeInfo>? = null,
     ): JsonWebKey() {
 
+        @SerialName("kty")
+        @EncodeDefault
+        override val keyType: String = "RSA"
+
         @Serializable
         public data class OtherPrimeInfo (
             /**
@@ -546,7 +563,6 @@ public sealed class JsonWebKey: SigningKey {
     }
 
     @Serializable
-    @SerialName("oct")
     public data class Symmetric (
         @SerialName("use") override val use: String? = null,
         @SerialName("key_ops") override val keyOperations: Set<String>? = null,
@@ -566,6 +582,10 @@ public sealed class JsonWebKey: SigningKey {
         @Serializable(with = Base64UrlBinary::class)
         public val keyValue: ByteArray
     ): JsonWebKey() {
+        @SerialName("kty")
+        @EncodeDefault
+        override val keyType: String = "oct"
+
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (other !is Symmetric) return false
@@ -612,13 +632,29 @@ public sealed class JsonWebKey: SigningKey {
     }
 
     public companion object {
+        public val serializers: SerializersModule = SerializersModule {
+            polymorphicDefaultDeserializer(JsonWebKey::class, { KeyPolymorphicSerializer })
+        }
+
         /**
          * Use this to deserialize JWKs, using the Key Type field to determine which class to use
-         * todo: maybe use custom KSerializer?
          */
         internal val format: Json = Json {
-            classDiscriminator = "kty"
+            serializersModule = serializers
             ignoreUnknownKeys = true
+            classDiscriminatorMode = ClassDiscriminatorMode.NONE
+            classDiscriminator = "_____unused"
+        }
+    }
+
+    internal object KeyPolymorphicSerializer: JsonContentPolymorphicSerializer<JsonWebKey>(JsonWebKey::class) {
+        override fun selectDeserializer(element: JsonElement): DeserializationStrategy<JsonWebKey> {
+            return when (val keyType = element.jsonObject["kty"]?.jsonPrimitive?.content) {
+                "RSA" -> RSA.serializer()
+                "EC" -> EllipticCurve.serializer()
+                "oct" -> Symmetric.serializer()
+                else -> throw SerializationException("Unknown key type: $keyType")
+            }
         }
     }
 }

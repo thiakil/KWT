@@ -3,7 +3,6 @@
 package com.thiakil.kwt
 
 import com.thiakil.kwt.helpers.encodeBase64Url
-import io.ktor.util.*
 import kotlin.test.*
 
 class TestJwk {
@@ -62,7 +61,7 @@ class TestJwk {
 
     @Test
     fun testPublicKeys() {
-        val keySet = JsonWebKeySet.decodeFromString(publicKeys)
+        val keySet = JsonWebKeySet.deserialize(publicKeys)
         assertEquals(4, keySet.keys.size)
 
         val key1 = keySet[0]
@@ -86,11 +85,14 @@ class TestJwk {
         assertEquals("A128KW", key3.algorithm)
         assertNotNull(key3.keyValue)
         assertEquals(16, key3.keyValue.size)
+
+        val keySetCycled = JsonWebKeySet.deserialize(keySet.serialize())
+        assertEquals(keySet, keySetCycled)
     }
 
     @Test
     fun testPrivateKeys() {
-        val keySet = JsonWebKeySet.decodeFromString(privateKeys)
+        val keySet = JsonWebKeySet.deserialize(privateKeys)
         assertEquals(2, keySet.keys.size)
 
         val key1 = keySet[0]
