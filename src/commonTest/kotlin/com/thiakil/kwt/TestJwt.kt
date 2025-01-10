@@ -12,7 +12,7 @@ class TestJwt {
 
     @Test
     fun decodeBasic() {
-        val decoded = JWT.decode(basicEncodedJWT)
+        val decoded = JWT.decodeUnverified(basicEncodedJWT)
         assertEquals(JWS.Id.HS256, decoded.header.algorithm, "Header parse failed")
         assertEquals("JWT", decoded.header.type, "Header parse failed")
         assertEquals("joe", decoded.payload.issuer)
@@ -25,7 +25,7 @@ class TestJwt {
 
     @Test
     fun decodeUnsigned() {
-        val decoded = JWT.decode("eyJhbGciOiJub25lIn0." +
+        val decoded = JWT.decodeUnverified("eyJhbGciOiJub25lIn0." +
             "eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.")
         assertEquals(JWS.Id.NONE, decoded.header.algorithm)
         assertEquals("joe", decoded.payload.issuer)

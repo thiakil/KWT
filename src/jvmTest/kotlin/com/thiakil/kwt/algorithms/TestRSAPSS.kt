@@ -25,7 +25,7 @@ class TestRSAPSS {
 
     @Test
     fun testRSAPSSSignature() {
-        val jwt = JWT.decode(encodedJwt)
+        val jwt = JWT.decodeUnverified(encodedJwt)
         assertEquals(JWS.Id.PS256, jwt.header.algorithm)
         val key = JavaRSAKey(getPublicKey())
         assertTrue(PS256.verify(jwt.signature!!, key))
@@ -38,7 +38,7 @@ class TestRSAPSS {
             algorithm = JWS.Id.PS256
             key = JavaRSAKey(privateKey = getPrivateKey())
         }
-        assertTrue(PS256.verify(JWT.decode(signed).signature!!, JavaRSAKey(getPublicKey())))
+        assertTrue(PS256.verify(JWT.decodeUnverified(signed).signature!!, JavaRSAKey(getPublicKey())))
     }
 
     @Test

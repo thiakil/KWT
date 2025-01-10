@@ -8,7 +8,7 @@ import kotlin.test.*
 class TestECDSA {
     @Test
     fun testES256Verify() {
-        val jwt = JWT.decode(encodedJwt)
+        val jwt = JWT.decodeUnverified(encodedJwt)
         assertEquals(ES256.jwaId, jwt.header.algorithm)
         assertNotNull(jwt.signature)
         assertTrue(ES256.verify(jwt.signature!!, ecKey))
@@ -20,7 +20,7 @@ class TestECDSA {
             algorithm = JWS.Id.ES256
             key = ecKey
         }
-        val reDecoded = JWT.decode(signed)
+        val reDecoded = JWT.decodeUnverified(signed)
         assertNotNull(reDecoded.signature)
         assertTrue(ES256.verify(reDecoded.signature!!, ecKey))
 
@@ -30,7 +30,7 @@ class TestECDSA {
             algorithm = JWS.Id.ES256
             key = JavaECKey(null, ecKey.toJavaPrivate())
         }
-        val reDecodedNative = JWT.decode(signedNative)
+        val reDecodedNative = JWT.decodeUnverified(signedNative)
         assertNotNull(reDecodedNative.signature)
         assertTrue(ES256.verify(reDecodedNative.signature!!, ecKey))
     }

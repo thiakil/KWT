@@ -18,7 +18,7 @@ class TestRSA {
 
     @Test
     fun testRSASignature() {
-        val jwt = JWT.decode(encodedJwt)
+        val jwt = JWT.decodeUnverified(encodedJwt)
         assertEquals(JWS.Id.RS256, jwt.header.algorithm)
         val key = JavaRSAKey(publicKey)
         assertTrue(RS256.verify(jwt.signature!!, key))
@@ -26,7 +26,7 @@ class TestRSA {
 
     @Test
     fun testJWKRSASig() {
-        val jwt = JWT.decode(tokenSignedbyJwk)
+        val jwt = JWT.decodeUnverified(tokenSignedbyJwk)
         assertEquals(JWS.Id.RS256, jwt.header.algorithm)
         val jwk = JsonWebKey.format.decodeFromString<JsonWebKey>(testJWK)
         assertTrue(RS256.verify(jwt.signature!!, jwk))
@@ -42,7 +42,7 @@ class TestRSA {
             algorithm = JWS.Id.RS256
             key = jwk
         }
-        assertTrue(RS256.verify(JWT.decode(signed).signature!!, jwk))
+        assertTrue(RS256.verify(JWT.decodeUnverified(signed).signature!!, jwk))
     }
 
     @Test
@@ -52,7 +52,7 @@ class TestRSA {
             algorithm = JWS.Id.RS256
             key = JavaRSAKey(privateKey = privateKey)
         }
-        assertTrue(RS256.verify(JWT.decode(signed).signature!!, JavaRSAKey(publicKey)))
+        assertTrue(RS256.verify(JWT.decodeUnverified(signed).signature!!, JavaRSAKey(publicKey)))
     }
 
     @Test

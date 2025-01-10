@@ -9,7 +9,7 @@ object AlgorithmHelper {
     fun testSelfSignVerify(jwt: JWTPayload, algorithm: JwsAlgorithm, keyIn: SigningKey) {
         val signed = jwt.sign(JOSEHeaderData(algorithm = algorithm.jwaId), algorithm, keyIn)
         println("${algorithm.jwaId}: $signed")
-        val decodedJWT = JWT.decode(signed)
+        val decodedJWT = JWT.decodeUnverified(signed)
         assertEquals(algorithm.jwaId, decodedJWT.header.algorithm)
         if (algorithm != UnsignedAlg) {
             assertNotNull(decodedJWT.signature, "expected a signature")

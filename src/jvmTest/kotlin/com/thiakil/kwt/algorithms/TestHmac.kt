@@ -11,7 +11,7 @@ class TestHmac {
     fun testHS256() {
         //signed with secret bytes the UTF-8 string "test"
         val token =
-            JWT.decode("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2MDgzMDE3MTh9.0fw6h3xOPG_Ptqy7Wt-wIi8TX4H6d9p2hi5radQGojU")
+            JWT.decodeUnverified("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2MDgzMDE3MTh9.0fw6h3xOPG_Ptqy7Wt-wIi8TX4H6d9p2hi5radQGojU")
         assertEquals(HS256.jwaId, token.header.algorithm)
         val correctKey = HmacStringKey("test")
         assertEquals(HS256.jwaId, token.header.algorithm)
@@ -27,7 +27,7 @@ class TestHmac {
             algorithm = JWS.Id.HS256
             this.key = key
         }
-        assertTrue(HS256.verify(JWT.decode(signed).signature!!, key))
+        assertTrue(HS256.verify(JWT.decodeUnverified(signed).signature!!, key))
     }
 
     @Test
@@ -37,7 +37,7 @@ class TestHmac {
             alg = HS256
             key = hmackey
         }
-        assertTrue(HS256.verify(JWT.decode(signed).signature!!, hmackey))
+        assertTrue(HS256.verify(JWT.decodeUnverified(signed).signature!!, hmackey))
     }
 
     @Test

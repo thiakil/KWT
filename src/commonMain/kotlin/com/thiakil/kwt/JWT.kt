@@ -45,11 +45,11 @@ public object JWT {
     }
 
     /**
-     * Decode a JWS Compact Format encoded JWT
+     * Decode a JWS Compact Format encoded JWT without verifying the signature
      *
-     * @throws JWSDecodeException
+     * @throws JWSDecodeException if the token is malformed
      */
-    public fun decode(jwsToken: String): DecodedJWT {
+    public fun decodeUnverified(jwsToken: String): DecodedJWT {
         val parts = jwsToken.split(".")
         when {
             parts.size < 2 -> throw JWSDecodeException("Invalid JWS")
@@ -66,8 +66,16 @@ public object JWT {
         }
         //technically it should still have a third part, but it will be an empty string
         if (header.algorithm != JWS.Id.NONE && parts.size != 3) throw JWSDecodeException("missing signature")
-        val payloadRaw = json.parseToJsonElement(parts[1].decodeBase64UrlString())
-        val payload = json.decodeFromJsonElement<JWTClaimsSetData>(payloadRaw)
+        val payloadRaw = try {
+            json.parseToJsonElement(parts[1].decodeBase64UrlString())
+        } catch (e:Exception) {
+            throw JWSDecodeException("Payload deserialisation failed: ${e.message}", e)
+        }
+        val payload = try {
+            json.decodeFromJsonElement<JWTClaimsSetData>(payloadRaw)
+        } catch (e: Exception) {
+            throw JWSDecodeException("Payload deserialisation failed: ${e.message}", e)
+        }
         val payloadUnknowns = payloadRaw.jsonObject.toMutableMap()
         knownClaims.forEach { payloadUnknowns.remove(it) }
         val signature = if (parts.size == 3 && parts[2] != "") parts[2].decodeBase64UrlBytes() else null
