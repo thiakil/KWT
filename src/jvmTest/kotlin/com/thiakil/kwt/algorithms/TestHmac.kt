@@ -33,10 +33,7 @@ class TestHmac {
     @Test
     fun testHS256SignDSL() {
         val hmackey = HmacStringKey("test")
-        val signed = baseToken.sign {
-            alg = HS256
-            key = hmackey
-        }
+        val signed = baseToken.sign(JOSEHeaderData(algorithm = JWS.Id.HS256), HS256, hmackey)
         assertTrue(HS256.verify(JWT.decodeUnverified(signed).signature!!, hmackey))
     }
 

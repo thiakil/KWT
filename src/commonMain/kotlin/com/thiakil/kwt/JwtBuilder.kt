@@ -245,13 +245,6 @@ public class JwtSignatureBuilder(
     @Required
     public override var algorithm: JWS.Id = JWS.Id.NONE
 
-    //testing only
-    internal var alg: JwsAlgorithm
-        set(value) {
-            algorithm = value.jwaId
-        }
-        get() = JWS[algorithm]
-
     @JwtDSL
     @SerialName("jku")
     public override var jwkSetUrl: String? = null
