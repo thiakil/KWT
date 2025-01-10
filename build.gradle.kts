@@ -18,9 +18,11 @@ kotlin {
     explicitApi()
 
     jvm()
-    //js() {
-    //    nodejs()
-    //}
+    js() {
+        nodejs()
+
+        useCommonJs()
+    }
     //mingwX64()
     //linuxX64()
     //linuxArm64()
