@@ -1,5 +1,3 @@
-
-
 package com.thiakil.kwt.algorithms
 
 import com.thiakil.kwt.JWS
@@ -13,17 +11,6 @@ import com.thiakil.kwt.helpers.encodeBase64Url
 import java.security.MessageDigest
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
-
-public interface HmacKey: SigningKey {
-    public val secretBytes: ByteArray
-}
-
-public class HmacByteKey(override val secretBytes: ByteArray): HmacKey
-
-public data class HmacStringKey(val secret: String): HmacKey {
-    override val secretBytes: ByteArray
-        get() = secret.toByteArray(Charsets.UTF_8)
-}
 
 public sealed class HmacBase(override val jwaId: JWS.Id, alg: SHAType): JwsAlgorithm {
     private val javaSigAlg = when(alg) {

@@ -2,6 +2,8 @@
 
 package com.thiakil.kwt.helpers
 
+import io.ktor.utils.io.charsets.*
+import io.ktor.utils.io.core.*
 import kotlin.io.encoding.Base64
 
 private val base64 = Base64.UrlSafe.withPadding(Base64.PaddingOption.ABSENT_OPTIONAL)
