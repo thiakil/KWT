@@ -44,12 +44,12 @@ kotlin {
 ```kotlin
 val hmacKey = HmacStringKey("This is my key")
 
-val token: String = makeJWT {
+val token: String = jwt {
     issuer = "test-issuer"
     singleAudience = "test"
     subject = "test testerton"
 }.sign {
-    alg = HS256
+    alg = JWS.Id.HS256
     key = hmacKey
 }
 println(token)
@@ -61,11 +61,7 @@ println(token)
 val hmacKey = HmacStringKey("This is my key")
 val token: String = "<token from above>"
 
-val decoded = JWT.decode(token)
-
-// verify the token's signature (don't trust the data without)
-val validSignature: Boolean = HS256.verify(decoded.signature!!, hmacKey)
-println(validSignature)//true
+val decoded: JWTPayload = JWT.validate(token, hmacKey)
 
 // NB: at this point you should also be checking #expiresAt and #notBefore if they are present in your token
 println(decoded.issuer) // "test-issuer"
@@ -74,4 +70,14 @@ println(decoded.audience) // ["test"]
 
 // Non-standard claims are available under #unknownClaims
 
+```
+
+### JSON Web Keys / Key Sets
+```kotlin
+val keySetData: String = "{...}"//load key set json from source
+val keySet = JsonWebKeySet.decodeFromString(keySetData)
+
+val decoded: JWTPayload = JWT.validate(token) { header ->
+    keySet.find { it.keyId == header.keyId }!!
+}
 ```
