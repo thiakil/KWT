@@ -81,11 +81,19 @@ public object JWS {
 
 internal expect val JWS_ALGORITHMS: Map<JWS.Id, JwsAlgorithm>
 
-public sealed class JwsException(override val message: String, cause: Exception?=null): RuntimeException(message, cause)
-
 public interface JwsAlgorithm {
+    /** The algorithm identifier for the JOSE header */
     public val jwaId: JWS.Id
+
+    /**
+     * Verify the signature with the provided key
+     * @return true when signature is valid
+     */
     public fun verify(signature: UnverifiedSignature, key: SigningKey): Boolean
+
+    /**
+     * Sign the payload, returning the Base64-URL encoded signature part
+     */
     public fun sign(payload: String, key: SigningKey): String
 }
 
@@ -94,15 +102,17 @@ public interface JwsAlgorithm {
  * Either a deserialized JWK or a platform dependant native key.
  */
 public interface SigningKey {
-    public object NONE: SigningKey
+    /** for use with [JWS.Id.NONE] or as a default value */
+    public data object NONE: SigningKey
 }
 
-/**
- * Thrown by a [JwsAlgorithm] when the key supplied cannot by used by the algorithm.
- */
+public sealed class JwsException(override val message: String, cause: Exception?=null): RuntimeException(message, cause)
+
+/** Thrown by a [JwsAlgorithm] when the key supplied cannot be used by the algorithm. */
 public class UnsupportedKeyException(message: String, cause: Exception? = null): JwsException(message, cause)
 
 /** Thrown when a signature doesn't match the algorithm's expected format */
 public class InvalidSignatureException(message: String, cause: Exception? = null): JwsException(message, cause)
 
+/** Thrown when the requested algorithm is not supported by the current platform */
 public class UnsupportedJWSAlgorithm(algorithm: JWS.Id): JwsException("Unsupported algorithm: $algorithm")
