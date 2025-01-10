@@ -1,6 +1,6 @@
 Kotlin Web Tokens (KWT)
 =======================
-KWT is a Kotlin multiplatform library for creating and verifying [JSON Web Tokens](https://jwt.io/introduction) (JWT) in compact serialised form (JWS). It can be used in Java projects, though requires the Kotlin runtime.
+KWT is a Kotlin multiplatform library for creating and verifying [JSON Web Tokens](https://jwt.io/introduction) (JWT) in compact serialised form (JWS). JSON Web Keys (JWK) are also supported and can be created from some platform native keys.
 
 Originally it was intended to be added to Ktor as another Auth algorithm that was available on more than just JVM, but I decided it might also be useful outside Ktor in Kotlin-jvm projects.
 
