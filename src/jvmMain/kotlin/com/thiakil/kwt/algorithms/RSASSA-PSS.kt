@@ -55,6 +55,6 @@ public sealed class RsassPssBase(override val jwaId: JWS.Id, alg: SHAType): JwsA
     }
 }
 
-public object PS256: RsassPssBase(JWS.Id.PS256, SHAType.SHA256)
-public object PS384: RsassPssBase(JWS.Id.PS384, SHAType.SHA384)
-public object PS512: RsassPssBase(JWS.Id.PS512, SHAType.SHA512)
+public data object PS256: RsassPssBase(JWS.Id.PS256, SHAType.SHA256)
+public data object PS384: RsassPssBase(JWS.Id.PS384, SHAType.SHA384)
+public data object PS512: RsassPssBase(JWS.Id.PS512, SHAType.SHA512)

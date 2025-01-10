@@ -38,6 +38,6 @@ public sealed class RSABase(override val jwaId: JWS.Id, alg: SHAType): JwsAlgori
     }
 }
 
-public object RS256: RSABase(JWS.Id.RS256, SHAType.SHA256)
-public object RS384: RSABase(JWS.Id.RS384, SHAType.SHA384)
-public object RS512: RSABase(JWS.Id.RS512, SHAType.SHA512)
+public data object RS256: RSABase(JWS.Id.RS256, SHAType.SHA256)
+public data object RS384: RSABase(JWS.Id.RS384, SHAType.SHA384)
+public data object RS512: RSABase(JWS.Id.RS512, SHAType.SHA512)

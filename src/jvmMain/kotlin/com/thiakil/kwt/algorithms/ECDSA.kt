@@ -209,6 +209,6 @@ public sealed class EcdsaBase(override val jwaId: JWS.Id, shaType: SHAType): Jws
     }
 }
 
-public object ES256: EcdsaBase(JWS.Id.ES256, SHAType.SHA256)
-public object ES384: EcdsaBase(JWS.Id.ES384, SHAType.SHA384)
-public object ES512: EcdsaBase(JWS.Id.ES512, SHAType.SHA512)
+public data object ES256: EcdsaBase(JWS.Id.ES256, SHAType.SHA256)
+public data object ES384: EcdsaBase(JWS.Id.ES384, SHAType.SHA384)
+public data object ES512: EcdsaBase(JWS.Id.ES512, SHAType.SHA512)

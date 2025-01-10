@@ -43,6 +43,6 @@ public sealed class HmacBase(override val jwaId: JWS.Id, alg: SHAType): JwsAlgor
     override fun sign(payload: String, key: SigningKey): String = doMac(key, payload).encodeBase64Url()
 }
 
-public object HS256: HmacBase(JWS.Id.HS256, SHAType.SHA256)
-public object HS384: HmacBase(JWS.Id.HS384, SHAType.SHA384)
-public object HS512: HmacBase(JWS.Id.HS512, SHAType.SHA512)
+public data object HS256: HmacBase(JWS.Id.HS256, SHAType.SHA256)
+public data object HS384: HmacBase(JWS.Id.HS384, SHAType.SHA384)
+public data object HS512: HmacBase(JWS.Id.HS512, SHAType.SHA512)
