@@ -2,7 +2,6 @@
 
 package com.thiakil.kwt
 
-import com.thiakil.kwt.algorithms.*
 import io.ktor.util.date.*
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
@@ -214,7 +213,7 @@ public class JwtBuilder: JWTClaimsSet {
 internal annotation class JwtDSL
 
 @JwtDSL
-public fun makeJWT(block: JwtBuilder.()->Unit): JWTPayload = JwtBuilder().apply(block).build()
+public fun jwt(block: JwtBuilder.()->Unit): JWTPayload = JwtBuilder().apply(block).build()
 
 @JwtDSL
 @Serializable

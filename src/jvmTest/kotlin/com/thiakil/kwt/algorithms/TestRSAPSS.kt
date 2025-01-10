@@ -6,7 +6,7 @@ import com.thiakil.kwt.AlgorithmHelper
 import com.thiakil.kwt.JWS
 import com.thiakil.kwt.JWT
 import com.thiakil.kwt.JsonWebKey
-import com.thiakil.kwt.makeJWT
+import com.thiakil.kwt.jwt
 import com.thiakil.kwt.sign
 import io.ktor.util.*
 import java.security.KeyFactory
@@ -64,7 +64,7 @@ class TestRSAPSS {
     }
 
     companion object {
-        private val baseToken = makeJWT {
+        private val baseToken = jwt {
             issuer = "test-issuer"
             singleAudience = "test"
             subject = "test testerton"

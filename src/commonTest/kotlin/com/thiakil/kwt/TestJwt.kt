@@ -35,7 +35,7 @@ class TestJwt {
     @Test
     fun signLoopUnsigned() {
         AlgorithmHelper.testSelfSignVerify(
-            makeJWT {
+            jwt {
                 issuer = "example.com"
                 singleAudience = "example"
                 givenName = "Test"

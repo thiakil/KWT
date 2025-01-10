@@ -6,7 +6,7 @@ import com.thiakil.kwt.AlgorithmHelper
 import com.thiakil.kwt.JWS
 import com.thiakil.kwt.JWT
 import com.thiakil.kwt.JsonWebKey
-import com.thiakil.kwt.makeJWT
+import com.thiakil.kwt.jwt
 import com.thiakil.kwt.sign
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -45,7 +45,7 @@ class TestECDSA {
 
     @Test
     fun testSignVerifyLoop(){
-        val baseToken = makeJWT {
+        val baseToken = jwt {
             issuer = "test-issuer"
             singleAudience = "test"
             subject = "test testerton"

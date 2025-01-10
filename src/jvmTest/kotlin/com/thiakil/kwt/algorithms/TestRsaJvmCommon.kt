@@ -8,7 +8,7 @@ import com.thiakil.kwt.JOSEHeaderData
 import com.thiakil.kwt.JWS
 import com.thiakil.kwt.JWT
 import com.thiakil.kwt.JsonWebKey
-import com.thiakil.kwt.makeJWT
+import com.thiakil.kwt.jwt
 import java.security.KeyPairGenerator
 import java.security.SecureRandom
 import java.security.interfaces.RSAPrivateKey
@@ -60,7 +60,7 @@ class TestRsaJvmCommon {
         assert(newJwk.isValidPrivateKey)
         assert(newJwk.isValidPublicKey)
 
-        val baseToken = makeJWT {
+        val baseToken = jwt {
             issuer = "test-issuer"
             singleAudience = "test"
             subject = "test testerton"

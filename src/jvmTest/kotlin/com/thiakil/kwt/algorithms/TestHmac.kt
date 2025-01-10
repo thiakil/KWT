@@ -6,7 +6,7 @@ import com.thiakil.kwt.AlgorithmHelper
 import com.thiakil.kwt.JOSEHeaderData
 import com.thiakil.kwt.JWS
 import com.thiakil.kwt.JWT
-import com.thiakil.kwt.makeJWT
+import com.thiakil.kwt.jwt
 import com.thiakil.kwt.sign
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -52,7 +52,7 @@ class TestHmac {
         AlgorithmHelper.testSelfSignVerify(baseToken, HS512, HmacByteKey(byteArrayOf(1,2,3,4,5,6)))
     }
 
-    private val baseToken = makeJWT {
+    private val baseToken = jwt {
         issuer = "test-issuer"
         singleAudience = "test"
         subject = "test testerton"
