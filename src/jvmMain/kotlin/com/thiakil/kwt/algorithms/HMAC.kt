@@ -2,11 +2,17 @@
 
 package com.thiakil.kwt.algorithms
 
-import com.thiakil.kwt.*
+import com.thiakil.kwt.JWS
+import com.thiakil.kwt.JsonWebKey
+import com.thiakil.kwt.JwsAlgorithm
+import com.thiakil.kwt.SHAType
+import com.thiakil.kwt.SigningKey
+import com.thiakil.kwt.UnsupportedKeyException
+import com.thiakil.kwt.UnverifiedSignature
 import com.thiakil.kwt.helpers.encodeBase64Url
-import java.security.*
-import javax.crypto.*
-import javax.crypto.spec.*
+import java.security.MessageDigest
+import javax.crypto.Mac
+import javax.crypto.spec.SecretKeySpec
 
 public interface HmacKey: SigningKey {
     public val secretBytes: ByteArray

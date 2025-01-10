@@ -2,12 +2,21 @@
 
 package com.thiakil.kwt.algorithms
 
-import com.thiakil.kwt.*
+import com.thiakil.kwt.AlgorithmHelper
+import com.thiakil.kwt.JWS
+import com.thiakil.kwt.JWT
+import com.thiakil.kwt.JsonWebKey
+import com.thiakil.kwt.makeJWT
+import com.thiakil.kwt.sign
 import io.ktor.util.*
-import java.security.*
-import java.security.interfaces.*
-import java.security.spec.*
-import kotlin.test.*
+import java.security.KeyFactory
+import java.security.interfaces.RSAPrivateKey
+import java.security.interfaces.RSAPublicKey
+import java.security.spec.PKCS8EncodedKeySpec
+import java.security.spec.X509EncodedKeySpec
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class TestRSAPSS {
 

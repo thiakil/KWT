@@ -2,8 +2,16 @@
 
 package com.thiakil.kwt.algorithms
 
-import com.thiakil.kwt.*
-import kotlin.test.*
+import com.thiakil.kwt.AlgorithmHelper
+import com.thiakil.kwt.JWS
+import com.thiakil.kwt.JWT
+import com.thiakil.kwt.JsonWebKey
+import com.thiakil.kwt.makeJWT
+import com.thiakil.kwt.sign
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class TestECDSA {
     @Test

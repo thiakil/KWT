@@ -2,12 +2,26 @@
 
 package com.thiakil.kwt.algorithms
 
-import com.thiakil.kwt.*
-import org.jetbrains.annotations.*
-import java.math.*
-import java.security.*
-import java.security.interfaces.*
-import java.security.spec.*
+import com.thiakil.kwt.JsonWebKey
+import com.thiakil.kwt.SigningKey
+import com.thiakil.kwt.UnsupportedKeyException
+import org.jetbrains.annotations.Contract
+import java.math.BigInteger
+import java.security.KeyFactory
+import java.security.KeyPair
+import java.security.NoSuchAlgorithmException
+import java.security.PrivateKey
+import java.security.interfaces.RSAMultiPrimePrivateCrtKey
+import java.security.interfaces.RSAPrivateCrtKey
+import java.security.interfaces.RSAPrivateKey
+import java.security.interfaces.RSAPublicKey
+import java.security.spec.InvalidKeySpecException
+import java.security.spec.KeySpec
+import java.security.spec.RSAMultiPrimePrivateCrtKeySpec
+import java.security.spec.RSAOtherPrimeInfo
+import java.security.spec.RSAPrivateCrtKeySpec
+import java.security.spec.RSAPrivateKeySpec
+import java.security.spec.RSAPublicKeySpec
 
 public data class JavaRSAKey(val publicKey: RSAPublicKey? = null, val privateKey: RSAPrivateKey? = null): SigningKey {
     public constructor(keyPair: KeyPair): this(keyPair.public as RSAPublicKey?, keyPair.private as RSAPrivateKey?)

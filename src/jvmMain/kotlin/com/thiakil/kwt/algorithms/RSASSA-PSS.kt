@@ -2,12 +2,18 @@
 
 package com.thiakil.kwt.algorithms
 
+import com.thiakil.kwt.JWS
+import com.thiakil.kwt.JsonWebKey
+import com.thiakil.kwt.JwsAlgorithm
+import com.thiakil.kwt.SHAType
 import com.thiakil.kwt.SigningKey
-import com.thiakil.kwt.*
+import com.thiakil.kwt.UnsupportedKeyException
+import com.thiakil.kwt.UnverifiedSignature
 import com.thiakil.kwt.helpers.encodeBase64Url
-import io.ktor.util.*
-import java.security.*
-import java.security.spec.*
+import java.security.SecureRandom
+import java.security.Signature
+import java.security.spec.MGF1ParameterSpec
+import java.security.spec.PSSParameterSpec
 
 private val SHAType.mdName get() = when(this) {
     SHAType.SHA256 -> "SHA-256"

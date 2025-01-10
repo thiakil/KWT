@@ -3,7 +3,6 @@ package com.thiakil.kwt
 import com.thiakil.kwt.algorithms.UnsignedAlg
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.lang.RuntimeException
 
 /**
  * RFC 7518 - 3.1.  "alg" (Algorithm) Header Parameter Values for JWS

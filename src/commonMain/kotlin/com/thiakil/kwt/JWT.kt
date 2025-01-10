@@ -4,8 +4,16 @@ import com.thiakil.kwt.helpers.decodeBase64UrlBytes
 import com.thiakil.kwt.helpers.decodeBase64UrlString
 import com.thiakil.kwt.helpers.encodeBase64Url
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.*
-import kotlinx.serialization.modules.*
+import kotlinx.serialization.json.ClassDiscriminatorMode
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
+import kotlinx.serialization.modules.subclass
 
 public object JWT {
     private val base64UrlFormat: Regex = Regex("[-A-Za-z0-9_]+")

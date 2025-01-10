@@ -3,18 +3,32 @@
 package com.thiakil.kwt.algorithms
 
 import com.thiakil.kwt.InvalidSignatureException
-import com.thiakil.kwt.*
+import com.thiakil.kwt.JWS
+import com.thiakil.kwt.JsonWebKey
+import com.thiakil.kwt.JwsAlgorithm
+import com.thiakil.kwt.SHAType
+import com.thiakil.kwt.SigningKey
+import com.thiakil.kwt.UnsupportedKeyException
+import com.thiakil.kwt.UnverifiedSignature
 import com.thiakil.kwt.helpers.encodeBase64Url
 import io.ktor.utils.io.core.*
 import kotlinx.io.readByteArray
-import java.math.*
-import java.security.*
-import java.security.spec.*
-import kotlin.math.*
-import java.security.spec.ECGenParameterSpec
-
+import java.math.BigInteger
 import java.security.AlgorithmParameters
-import java.security.interfaces.*
+import java.security.KeyFactory
+import java.security.PrivateKey
+import java.security.PublicKey
+import java.security.SecureRandom
+import java.security.Signature
+import java.security.interfaces.ECPrivateKey
+import java.security.interfaces.ECPublicKey
+import java.security.spec.ECGenParameterSpec
+import java.security.spec.ECParameterSpec
+import java.security.spec.ECPoint
+import java.security.spec.ECPrivateKeySpec
+import java.security.spec.ECPublicKeySpec
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.text.toByteArray
 
 private val JsonWebKey.EllipticCurve.ecParameterSpec: ECParameterSpec
