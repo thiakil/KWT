@@ -2,8 +2,7 @@
 
 package com.thiakil.kwt
 
-import com.thiakil.kwt.*
-import com.thiakil.kwt.algorithms.None
+import com.thiakil.kwt.algorithms.UnsignedAlg
 import io.ktor.util.date.*
 import kotlinx.serialization.json.*
 import kotlin.test.*
@@ -42,7 +41,7 @@ class TestJwt {
                 givenName = "Test"
                 familyName = "Testerton"
             },
-            None,
+            UnsignedAlg,
             SigningKey.NONE
         )
     }

@@ -1,6 +1,6 @@
 package com.thiakil.kwt
 
-import com.thiakil.kwt.algorithms.None
+import com.thiakil.kwt.algorithms.UnsignedAlg
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.lang.RuntimeException
@@ -72,7 +72,7 @@ public object JWS {
 
     public operator fun get(algorithm: Id): JwsAlgorithm {
         return when(algorithm) {
-            Id.NONE -> None
+            Id.NONE -> UnsignedAlg
             else -> JWS_ALGORITHMS[algorithm] ?: throw UnsupportedJWSAlgorithm(algorithm)
         }
     }

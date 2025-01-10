@@ -2,7 +2,7 @@
 
 package com.thiakil.kwt
 
-import com.thiakil.kwt.algorithms.None
+import com.thiakil.kwt.algorithms.UnsignedAlg
 import kotlin.test.*
 
 object AlgorithmHelper {
@@ -11,7 +11,7 @@ object AlgorithmHelper {
         println("${algorithm.jwaId}: $signed")
         val decodedJWT = JWT.decode(signed)
         assertEquals(algorithm.jwaId, decodedJWT.header.algorithm)
-        if (algorithm != None) {
+        if (algorithm != UnsignedAlg) {
             assertNotNull(decodedJWT.signature, "expected a signature")
         }
         //handle none algo
