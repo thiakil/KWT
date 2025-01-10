@@ -13,6 +13,8 @@ object AlgorithmHelper {
         assertEquals(algorithm.jwaId, decodedJWT.header.algorithm)
         if (algorithm != UnsignedAlg) {
             assertNotNull(decodedJWT.signature, "expected a signature")
+            val allInOne = JWT.validate(signed, keyIn)
+            assertEquals(jwt.getFields(), allInOne.getFields())
         }
         //handle none algo
         val signature = decodedJWT.signature ?: UnverifiedSignature("", ByteArray(0))

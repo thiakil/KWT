@@ -68,7 +68,7 @@ public object JWT {
         if (header.algorithm != JWS.Id.NONE && parts.size != 3) throw JWSDecodeException("missing signature")
         val payloadRaw = try {
             json.parseToJsonElement(parts[1].decodeBase64UrlString())
-        } catch (e:Exception) {
+        } catch (e: Exception) {
             throw JWSDecodeException("Payload deserialisation failed: ${e.message}", e)
         }
         val payload = try {
@@ -85,6 +85,23 @@ public object JWT {
             signature = signature?.let { UnverifiedSignature(parts[0] + "." + parts[1], it) }
         )
     }
+
+    /**
+     * Basic decode + validate method. Expiry dates must still be checked by caller
+     */
+    public inline fun validate(jwsToken: String, keyProvider: (JOSEHeader) -> SigningKey): JWTPayload {
+        val token = decodeUnverified(jwsToken)
+        val signature = token.signature
+        if (token.header.algorithm == JWS.Id.NONE || signature == null) {
+            throw JWSDecodeException("Can't validate token without a signature")
+        }
+        if (!JWS[token.header.algorithm].verify(signature, keyProvider(token.header))) {
+            throw JWSDecodeException("Signature verification failed")
+        }
+        return token.payload
+    }
+
+    public fun validate(jwsToken: String, key: SigningKey): JWTPayload = validate(jwsToken, { key })
 }
 
 public class JWSDecodeException(message: String, cause: Exception? = null) : RuntimeException(message, cause)
