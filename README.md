@@ -22,6 +22,12 @@ Platforms without sign/verify support are able to decode a JWT's contents (insec
 | PS384     | ✅   |        |       |         |
 | PS512     | ✅   |        |       |         |
 
+| JWK Type    | JVM | NodeJS | Linux | MinGW64 |
+|-------------|-----|--------|-------|---------|
+| RSA         | ✅   |  ✅     |       |         |
+| EC          | ✅   |        |       |         |
+| Symmetrical | ✅   | ✅      |       |         |
+
 ## Getting Started
 
 ### Add Dependency
