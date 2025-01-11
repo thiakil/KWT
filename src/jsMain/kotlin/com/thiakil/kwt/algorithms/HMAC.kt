@@ -10,6 +10,7 @@ import com.thiakil.kwt.UnverifiedSignature
 import com.thiakil.kwt.helpers.encodeBase64Url
 import node.Crypto
 import node.toKotlinArray
+import node.toPlatformArray
 
 internal class HmacBase(override val jwaId: JWS.Id, alg: SHAType): JwsAlgorithm {
     private val nodeAlg = when(alg) {
@@ -24,8 +25,8 @@ internal class HmacBase(override val jwaId: JWS.Id, alg: SHAType): JwsAlgorithm 
             is HmacKey -> key.secretBytes
             else -> throw UnsupportedKeyException("Unknown key type")
         }
-        val hmac = Crypto.createHmac(nodeAlg, keyBytes)
-        hmac.update(data)
+        val hmac = Crypto.createHmac(nodeAlg, keyBytes.toPlatformArray())
+        hmac.update(data, "utf8")
         return hmac.digest().toKotlinArray()
     }
 
