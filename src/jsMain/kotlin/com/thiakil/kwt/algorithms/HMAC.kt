@@ -8,10 +8,8 @@ import com.thiakil.kwt.SigningKey
 import com.thiakil.kwt.UnsupportedKeyException
 import com.thiakil.kwt.UnverifiedSignature
 import com.thiakil.kwt.helpers.encodeBase64Url
-import node.Buffer
 import node.Crypto
 import node.toKotlinArray
-import node.toPlatformArray
 
 internal class HmacBase(override val jwaId: JWS.Id, alg: SHAType): JwsAlgorithm {
     private val nodeAlg = when(alg) {
