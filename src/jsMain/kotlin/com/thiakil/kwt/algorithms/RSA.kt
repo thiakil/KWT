@@ -27,6 +27,9 @@ internal class RSABase(override val jwaId: JWS.Id, alg: SHAType): JwsAlgorithm {
             is JsonWebKey.RSA -> key.toKeyObjectPublic()
             else -> throw UnsupportedKeyException("Unknown key: $key")
         }
+        if (publicKey.asymmetricKeyType != "rsa") {
+            throw UnsupportedKeyException("Not an RSA key $key")
+        }
         val v = Crypto.createVerify(sigAlg)
         v.update(signature.subject, "utf8")
         return v.verify(publicKey, signature.signature.toPlatformArray())
@@ -37,6 +40,9 @@ internal class RSABase(override val jwaId: JWS.Id, alg: SHAType): JwsAlgorithm {
             is JSKeyObject -> key.key
             is JsonWebKey.RSA -> key.toKeyObjectPrivate()
             else -> throw UnsupportedKeyException("Unknown key: $key")
+        }
+        if (privateKey.asymmetricKeyType != "rsa") {
+            throw UnsupportedKeyException("Not an RSA key $key")
         }
         val s = Crypto.createSign(sigAlg)
         s.update(payload, "utf8")
