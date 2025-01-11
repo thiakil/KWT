@@ -44,7 +44,13 @@ public external class Verify {
 
 public external interface KeyObject {
     public val asymmetricKeyType: String?
+    public val asymmetricKeyDetails: KeyDetails?
     public val type: String
+}
+public external interface KeyDetails {
+    public val namedCurve: String?
+    public val hashAlgorithm: String?
+    public val mgf1HashAlgorithm: String?
 }
 public fun KeyObject.wrap(): JSKeyObject = JSKeyObject(this)
 

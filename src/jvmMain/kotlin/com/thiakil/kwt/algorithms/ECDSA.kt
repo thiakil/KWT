@@ -10,6 +10,8 @@ import com.thiakil.kwt.SHAType
 import com.thiakil.kwt.SigningKey
 import com.thiakil.kwt.UnsupportedKeyException
 import com.thiakil.kwt.UnverifiedSignature
+import com.thiakil.kwt.algorithms.ecdsa.convertDERToRaw
+import com.thiakil.kwt.algorithms.ecdsa.convertRawSigToDER
 import com.thiakil.kwt.helpers.encodeBase64Url
 import io.ktor.utils.io.core.*
 import kotlinx.io.readByteArray
@@ -84,7 +86,7 @@ public sealed class EcdsaBase(override val jwaId: JWS.Id, shaType: SHAType): Jws
         val s = Signature.getInstance(javaSigAlg)
         s.initVerify(publicKey)
         s.update(signature.subject.toByteArray(Charsets.UTF_8))
-        return s.verify(convertRawSigToDER(signature.signature))
+        return s.verify(convertRawSigToDER(signature.signature, rsSize))
     }
 
     override fun sign(payload: String, key: SigningKey): String {
@@ -96,130 +98,7 @@ public sealed class EcdsaBase(override val jwaId: JWS.Id, shaType: SHAType): Jws
         val s = Signature.getInstance(javaSigAlg)
         s.initSign(privateKey, SecureRandom())
         s.update(payload.toByteArray(Charsets.UTF_8))
-        return convertDERToRaw(s.sign()).encodeBase64Url()
-    }
-
-    /**
-     * Converts from raw {R,S} signature format to DER-encoded like Java expects
-     */
-    private fun convertRawSigToDER(rawSignature: ByteArray): ByteArray {
-        if (rawSignature.size != rsSize * 2) {
-            throw InvalidSignatureException("Size mismatch for algorithm")
-        }
-
-        // Retrieve R and S number's length and padding.
-        val rPadding: Int = countPadding(rawSignature, 0, rsSize)
-        val sPadding: Int = countPadding(rawSignature, rsSize, rawSignature.size)
-        val rLength: Int = rsSize - rPadding
-        val sLength: Int = rsSize - sPadding
-        val length = 2 + rLength + 2 + sLength
-        if (length > 255) {
-            throw InvalidSignatureException("Expected compressed length <= 255")
-        }
-
-        return buildPacket {
-            // DER Structure: http://crypto.stackexchange.com/a/1797
-            // Header with signature length info
-            writeByte(0x30)
-            if (length > 0x7f){
-                writeByte(0x81.toByte())
-            }
-            writeByte((length and 0xff).toByte())
-
-            // Header with "min R" number length
-            writeByte(0x02)
-            writeByte(rLength.toByte())
-
-            // R number
-            if (rPadding < 0) {
-                writeByte(0)
-                writeFully(buffer= rawSignature, offset=0, length=rsSize)
-            } else {
-                writeFully(buffer = rawSignature, offset = rPadding, length = min(rsSize, rLength))
-            }
-
-            // Header with "min S" number length
-            writeByte(0x02)
-            writeByte(sLength.toByte())
-
-            // S number
-            if (sPadding < 0) {
-                writeByte(0)
-                writeFully(buffer=rawSignature, offset=rsSize, length=rsSize)
-            } else {
-                writeFully(buffer=rawSignature, offset=rsSize+sPadding, length=min(rsSize, sLength))
-            }
-
-        }.readByteArray()
-    }
-
-    private fun convertDERToRaw(derSignature: ByteArray): ByteArray {
-        // DER Structure: http://crypto.stackexchange.com/a/1797
-        val derEncoded = derSignature[0] == 0x30.toByte() && derSignature.size != rsSize * 2
-        if (!derEncoded) {
-            throw InvalidSignatureException("Invalid DER signature format.")
-        }
-
-        val joseSignature = ByteArray(rsSize * 2)
-
-        //Skip 0x30
-        var offset = 1
-        if (derSignature[1] == 0x81.toByte()) {
-            //Skip sign
-            offset++
-        }
-
-        //Convert to unsigned. Should match DER length - offset
-        val encodedLength: Int = derSignature[offset++].toInt() and 0xff
-        if (encodedLength != derSignature.size - offset) {
-            throw InvalidSignatureException("Invalid DER signature format.")
-        }
-
-        //Skip 0x02
-        offset++
-
-        //Obtain R number length (Includes padding) and skip it
-        val rLength = derSignature[offset++].toInt()
-        if (rLength > rsSize + 1) {
-            throw InvalidSignatureException("Invalid DER signature format.")
-        }
-        val rPadding: Int = rsSize - rLength
-        //Retrieve R number
-        System.arraycopy(
-            derSignature,
-            offset + max(-rPadding, 0),
-            joseSignature,
-            max(rPadding, 0),
-            rLength + min(rPadding, 0)
-        )
-
-        //Skip R number and 0x02
-        offset += rLength + 1
-
-        //Obtain S number length. (Includes padding)
-        val sLength = derSignature[offset++].toInt()
-        if (sLength > rsSize + 1) {
-            throw InvalidSignatureException("Invalid DER signature format.")
-        }
-        val sPadding: Int = rsSize - sLength
-        //Retrieve R number
-        System.arraycopy(
-            derSignature,
-            offset + max(-sPadding, 0),
-            joseSignature,
-            rsSize + max(sPadding, 0),
-            sLength + min(sPadding, 0)
-        )
-
-        return joseSignature
-    }
-
-    private fun countPadding(bytes: ByteArray, fromIndex: Int, toIndex: Int): Int {
-        var padding = 0
-        while (fromIndex + padding < toIndex && bytes[fromIndex + padding] == 0.toByte()) {
-            padding++
-        }
-        return if (bytes[fromIndex + padding].toInt() and 0xff > 0x7f) padding - 1 else padding
+        return convertDERToRaw(s.sign(), rsSize).encodeBase64Url()
     }
 }
 
