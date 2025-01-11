@@ -8,7 +8,10 @@ import com.thiakil.kwt.SigningKey
 import com.thiakil.kwt.UnsupportedKeyException
 import com.thiakil.kwt.UnverifiedSignature
 import com.thiakil.kwt.helpers.encodeBase64Url
-import Crypto
+import node.Buffer
+import node.Crypto
+import node.toKotlinArray
+import node.toPlatformArray
 
 internal class HmacBase(override val jwaId: JWS.Id, alg: SHAType): JwsAlgorithm {
     private val nodeAlg = when(alg) {
@@ -25,13 +28,12 @@ internal class HmacBase(override val jwaId: JWS.Id, alg: SHAType): JwsAlgorithm 
         }
         val hmac = Crypto.createHmac(nodeAlg, keyBytes)
         hmac.update(data)
-        return hmac.digest()
+        return hmac.digest().toKotlinArray()
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     override fun verify(signature: UnverifiedSignature, key: SigningKey): Boolean {
         val digest = createDigest(signature.subject, key)
-        return digest.toHexString() == signature.signature.toHexString()//this is dumb but only way to compare uint8 and int8 arrays??
+        return signature.signature.contentEquals(digest)
     }
 
     override fun sign(payload: String, key: SigningKey): String {
