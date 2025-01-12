@@ -31,7 +31,6 @@ abstract class HMACTests {
     fun testHS256SignDSL_() {
         val key = HmacStringKey("test")
         val signed = baseToken.sign {
-            type = "jwt"
             algorithm = JWS.Id.HS256
             this.key = key
         }

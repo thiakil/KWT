@@ -42,7 +42,6 @@ abstract class ECDSATests(
 
         //re-sign it with the same key and test it passes verification
         val signed = jwt.payload.sign {
-            type = "jwt"
             algorithm = expectedAlgo
             key = webKey
         }
@@ -52,7 +51,6 @@ abstract class ECDSATests(
 
         //re-sign it with the same key and test it passes verification
         val signedNative = jwt.payload.sign {
-            type = "jwt"
             algorithm = expectedAlgo
             key = platformPrivate
         }

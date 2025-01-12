@@ -37,7 +37,6 @@ abstract class RSATests(private val publicKey: SigningKey, private val privateKe
         assertTrue(jwk is JsonWebKey.RSA)
         assertTrue(jwk.isValidPrivateKey)
         val signed = baseToken.sign {
-            type = "jwt"
             algorithm = JWS.Id.RS256
             key = jwk
         }
@@ -47,7 +46,6 @@ abstract class RSATests(private val publicKey: SigningKey, private val privateKe
     abstract fun testSignAndVerify()
     fun testSignAndVerify_() {
         val signed = baseToken.sign {
-            type = "jwt"
             algorithm = JWS.Id.RS256
             key = privateKey
         }

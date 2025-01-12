@@ -43,7 +43,6 @@ class TestRSAPSS {
     @Test
     fun testSignAndVerify() {
         val signed = baseToken.sign {
-            type = "jwt"
             algorithm = JWS.Id.PS256
             key = JavaRSAKey(privateKey = getPrivateKey())
         }
