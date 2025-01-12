@@ -7,39 +7,24 @@ import node.wrap
 import kotlin.test.Test
 
 class TestECDSA: ECDSATests(
-    Crypto.createPrivateKey(objectOf {
-        key = NodeBuffer.Buffer.from(ecKey256PrivateDER, "base64")
-        format = "der"
-        type = "pkcs8"
-    }).wrap(),
-    Crypto.createPublicKey(objectOf {
-        key = NodeBuffer.Buffer.from(ecKey256PublicDER, "base64")
-        format = "der"
-        type = "spki"
-    }).wrap(),
-    Crypto.createPrivateKey(objectOf {
-        key = NodeBuffer.Buffer.from(ecKey521PrivateDER, "base64")
-        format = "der"
-        type = "pkcs8"
-    }).wrap(),
-    Crypto.createPublicKey(objectOf {
-        key = NodeBuffer.Buffer.from(ecKey521PublicDER, "base64")
-        format = "der"
-        type = "spki"
-    }).wrap(),
+    createPrivate(ecKey256PrivateDER),
+    createPublic(ecKey256PublicDER),
+    createPrivate(ecKey384PrivateDER),
+    createPublic(ecKey384PublicDER),
+    createPrivate(ecKey521PrivateDER),
+    createPublic(ecKey521PublicDER)
 ) {
-    @Test
-    override fun testES256Verify() {
-        testES256Verify_()
-    }
 
-    @Test
-    override fun testES512Verify() {
-        testES512Verify_()
-    }
-
-    @Test
-    override fun testSignVerifyLoop(){
-        testSignVerifyLoop_()
-    }
 }
+
+private fun createPublic(keyData: String) = Crypto.createPublicKey(objectOf {
+    key = NodeBuffer.Buffer.from(keyData, "base64")
+    format = "der"
+    type = "spki"
+}).wrap()
+
+private fun createPrivate(keyData: String) = Crypto.createPrivateKey(objectOf {
+    key = NodeBuffer.Buffer.from(keyData, "base64")
+    format = "der"
+    type = "pkcs8"
+}).wrap()

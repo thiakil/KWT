@@ -65,7 +65,7 @@ internal class EcdsaBase(override val jwaId: JWS.Id, shaType: SHAType): JwsAlgor
     private fun checkCurveType(jwaId: JWS.Id, key: KeyObject) {
         val expectedCurve = when (jwaId) {
             JWS.Id.ES256 -> "prime256"
-            JWS.Id.ES384 -> "prime384"
+            JWS.Id.ES384 -> "secp384r1"
             JWS.Id.ES512 -> "secp521r1"
             else -> throw IllegalStateException("Not ECDSA: $jwaId")
         }

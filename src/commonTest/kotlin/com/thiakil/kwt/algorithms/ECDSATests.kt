@@ -4,9 +4,11 @@ import com.thiakil.kwt.AlgorithmHelper
 import com.thiakil.kwt.JWS
 import com.thiakil.kwt.JWT
 import com.thiakil.kwt.JsonWebKey
+import com.thiakil.kwt.JwsAlgorithm
 import com.thiakil.kwt.SigningKey
 import com.thiakil.kwt.jwt
 import com.thiakil.kwt.sign
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -14,6 +16,8 @@ import kotlin.test.assertTrue
 abstract class ECDSATests(
     private val platformKeyPrivate256: SigningKey,
     private val platformKeyPublic256: SigningKey,
+    private val platformKeyPrivate384: SigningKey,
+    private val platformKeyPublic384: SigningKey,
     private val platformKeyPrivate521: SigningKey,
     private val platformKeyPublic521: SigningKey
 ) {
@@ -21,73 +25,66 @@ abstract class ECDSATests(
     private val ES384 = JWS[JWS.Id.ES384]
     private val ES512 = JWS[JWS.Id.ES512]
 
-    abstract fun testES256Verify()
-    fun testES256Verify_() {
-        val jwt = JWT.decodeUnverified(encodedJwt256)
-        assertEquals(ES256.jwaId, jwt.header.algorithm)
+    private fun testESInner(
+        expectedAlgo: JWS.Id,
+        esAlgo: JwsAlgorithm,
+        webKey: JsonWebKey.EllipticCurve,
+        platformPrivate: SigningKey,
+        platformPublic: SigningKey,
+        encodedJwt: String
+    ) {
+        assertEquals(expectedAlgo, esAlgo.jwaId, "Dev bad")
+        val jwt = JWT.decodeUnverified(encodedJwt)
+        assertEquals(esAlgo.jwaId, jwt.header.algorithm)
         assertNotNull(jwt.signature)
-        assertTrue(ES256.verify(jwt.signature!!, ecKey256))
-        assertTrue(ES256.verify(jwt.signature!!, platformKeyPublic256))
+        assertTrue(esAlgo.verify(jwt.signature!!, webKey))
+        assertTrue(esAlgo.verify(jwt.signature!!, platformPublic))
 
         //re-sign it with the same key and test it passes verification
         val signed = jwt.payload.sign {
             type = "jwt"
-            algorithm = JWS.Id.ES256
-            key = ecKey256
+            algorithm = expectedAlgo
+            key = webKey
         }
         val reDecoded = JWT.decodeUnverified(signed)
         assertNotNull(reDecoded.signature)
-        assertTrue(ES256.verify(reDecoded.signature!!, ecKey256))
+        assertTrue(esAlgo.verify(reDecoded.signature!!, webKey))
 
         //re-sign it with the same key and test it passes verification
         val signedNative = jwt.payload.sign {
             type = "jwt"
-            algorithm = JWS.Id.ES256
-            key = platformKeyPrivate256
+            algorithm = expectedAlgo
+            key = platformPrivate
         }
         val reDecodedNative = JWT.decodeUnverified(signedNative)
         assertNotNull(reDecodedNative.signature)
-        assertTrue(ES256.verify(reDecodedNative.signature!!, ecKey256))
+        assertTrue(esAlgo.verify(reDecodedNative.signature!!, webKey))
     }
 
-    abstract fun testES512Verify()
-    fun testES512Verify_() {
-        val jwt = JWT.decodeUnverified(encodedJwt512)
-        assertEquals(ES512.jwaId, jwt.header.algorithm)
-        assertNotNull(jwt.signature)
-        assertTrue(ES512.verify(jwt.signature!!, ecKey521))
-        assertTrue(ES512.verify(jwt.signature!!, platformKeyPublic521))
-
-        //re-sign it with the same key and test it passes verification
-        val signed = jwt.payload.sign {
-            type = "jwt"
-            algorithm = JWS.Id.ES512
-            key = ecKey521
-        }
-        val reDecoded = JWT.decodeUnverified(signed)
-        assertNotNull(reDecoded.signature)
-        assertTrue(ES512.verify(reDecoded.signature!!, ecKey521))
-
-        //re-sign it with the same key and test it passes verification
-        val signedNative = jwt.payload.sign {
-            type = "jwt"
-            algorithm = JWS.Id.ES512
-            key = platformKeyPrivate521
-        }
-        val reDecodedNative = JWT.decodeUnverified(signedNative)
-        assertNotNull(reDecodedNative.signature)
-        assertTrue(ES512.verify(reDecodedNative.signature!!, ecKey521))
+    @Test
+    fun testES256Verify() {
+        testESInner(JWS.Id.ES256, ES256, ecKey256, platformKeyPrivate256, platformKeyPublic256, encodedJwt256)
     }
 
-    abstract fun testSignVerifyLoop()
-    fun testSignVerifyLoop_(){
+    @Test
+    fun testES384Verify() {
+        testESInner(JWS.Id.ES384, ES384, ecKey384, platformKeyPrivate384, platformKeyPublic384, encodedJwt384)
+    }
+
+    @Test
+    fun testES512Verify() {
+        testESInner(JWS.Id.ES512, ES512, ecKey521, platformKeyPrivate521, platformKeyPublic521, encodedJwt512)
+    }
+
+    @Test
+    fun testSignVerifyLoop(){
         val baseToken = jwt {
             issuer = "test-issuer"
             singleAudience = "test"
             subject = "test testerton"
         }
         AlgorithmHelper.testSelfSignVerify(baseToken, ES256, ecKey256)
-        //AlgorithmHelper.testSelfSignVerify(baseToken, ES384, ecKey256) TODO need the right key
+        AlgorithmHelper.testSelfSignVerify(baseToken, ES384, ecKey384)
         AlgorithmHelper.testSelfSignVerify(baseToken, ES512, ecKey521)
     }
 
@@ -95,17 +92,35 @@ abstract class ECDSATests(
         // https://tools.ietf.org/html/rfc7515#appendix-A.3
         internal val ecKey256 = JsonWebKey.format.decodeFromString<JsonWebKey.EllipticCurve>(
             """{"kty":"EC",
-      "crv":"P-256",
-      "x":"f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU",
-      "y":"x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0",
-      "d":"jpsQnnGQmL-YBIffH1136cspYG6-0iY7X1fCE9-E9LI"
-     }"""
+          "crv":"P-256",
+          "x":"f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU",
+          "y":"x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0",
+          "d":"jpsQnnGQmL-YBIffH1136cspYG6-0iY7X1fCE9-E9LI"
+        }"""
         )
         internal val ecKey256PrivateDER = "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgjpsQnnGQmL+YBIff" +
                 "H1136cspYG6+0iY7X1fCE9+E9LKhRANCAAR/zc4ncPbEXUGDy+5v20t7WAczNXvp" +
                 "7xO6z248e9FURcfxRM0bvZt+hyzf7bnuufSzaV1uqQskrYpGIyiFiOWt"
         internal val ecKey256PublicDER = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEf83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRV" +
                 "EXH8UTNG72bfocs3+257rn0s2ldbqkLJK2KRiMohYjlrQ=="
+
+        internal val ecKey384 = JsonWebKey.format.decodeFromString<JsonWebKey.EllipticCurve>(
+            """{
+          "kty": "EC",
+          "kid": "c94c0f51-c534-495b-8ee8-5956ed0b072c",
+          "crv": "P-384",
+          "x": "0fUjZ80pI6S2IFsdOtz6mXg9SsMhibR1SfQJ1gulbq-eJfSRVhT7GoE8krbjcLZX",
+          "y": "qxP1j-eYiGsR8f0ZjP7vS44RdBzo7Griz1QSYcC8z2X5PHr-kHWjZoSTDJU1cRag",
+          "d": "Mca9DA4YkLc7_6hzUUKM-4B9ASUKvVVQthc8klRuSRUNzIpc4yRnwCKLv_8ZEFmL"
+        }"""
+        )
+        internal val ecKey384PrivateDER = "MIG2AgEAMBAGByqGSM49AgEGBSuBBAAiBIGeMIGbAgEBBDAxxr0MDhiQtzv/qHNR" +
+                "Qoz7gH0BJQq9VVC2FzySVG5JFQ3MilzjJGfAIou//xkQWYuhZANiAATR9SNnzSkj" +
+                "pLYgWx063PqZeD1KwyGJtHVJ9AnWC6Vur54l9JFWFPsagTyStuNwtlerE/WP55iI" +
+                "axHx/RmM/u9LjhF0HOjsauLPVBJhwLzPZfk8ev6QdaNmhJMMlTVxFqA="
+        internal val ecKey384PublicDER = "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAE0fUjZ80pI6S2IFsdOtz6mXg9SsMhibR1" +
+                "SfQJ1gulbq+eJfSRVhT7GoE8krbjcLZXqxP1j+eYiGsR8f0ZjP7vS44RdBzo7Gri" +
+                "z1QSYcC8z2X5PHr+kHWjZoSTDJU1cRag"
 
         //https://www.rfc-editor.org/rfc/rfc7515.html#appendix-A.4
         internal val ecKey521 = JsonWebKey.format.decodeFromString<JsonWebKey.EllipticCurve>(
@@ -121,5 +136,8 @@ abstract class ECDSATests(
         private val encodedJwt512 = "eyJhbGciOiJFUzUxMiJ9.eyJ0ZXN0IjoiZm9vIn0." +
                 "AGlDSCsM8BxI7QYLaCLKR1EIKWun4KlKu9QfM-CIe75RekFatt7_wl6X0JlzJEuHs_v-YkRi94WLnZC3NEpYifDPAcgTtCkRQP" +
                 "SiwTW_hCwqb7P0ZFvjgSivmc4fdtHWq-VgrJ5vHtVJz3MjOlYeemcAB_-W3CIZhK2yT92f8GzwJRS_"
+        private val encodedJwt384 = "eyJhbGciOiJFUzM4NCIsInR5cCI6IkpXVCJ9." +
+                "eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ." +
+                "CZoW2FieFYi4UrkDMgIURQBqK3XzmNFKLYuCljbwY4XTNkuFBXWVgXfTpzDssIojhEf4GEK-1t09qMv4bUQUHtrxmbTh8jAYbhogYBDGei5MNEBItO6jVz80Sx_lglgj"
     }
 }

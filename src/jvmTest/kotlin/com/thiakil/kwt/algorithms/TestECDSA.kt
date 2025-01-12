@@ -8,36 +8,26 @@ import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 import kotlin.test.Test
 
-val platformKey256 = JavaECKey(
-    publicKey = KeyFactory.getInstance("EC").generatePublic(X509EncodedKeySpec(ECDSATests.ecKey256PublicDER.decodeBase64Bytes())) as ECPublicKey,
-    privateKey = KeyFactory.getInstance("EC")
-        .generatePrivate(PKCS8EncodedKeySpec(ECDSATests.ecKey256PrivateDER.decodeBase64Bytes())) as ECPrivateKey
-)
+val keyFactory = KeyFactory.getInstance("EC")
 
-val platformKey521 = JavaECKey(
-    publicKey = KeyFactory.getInstance("EC").generatePublic(X509EncodedKeySpec(ECDSATests.ecKey521PublicDER.decodeBase64Bytes())) as ECPublicKey,
-    privateKey = KeyFactory.getInstance("EC")
-        .generatePrivate(PKCS8EncodedKeySpec(ECDSATests.ecKey521PrivateDER.decodeBase64Bytes())) as ECPrivateKey
-)
+private fun makeEcKey(publicDER: String, privateDER: String): JavaECKey {
+    return JavaECKey(
+        publicKey = keyFactory.generatePublic(X509EncodedKeySpec(publicDER.decodeBase64Bytes())) as ECPublicKey,
+        privateKey = keyFactory.generatePrivate(PKCS8EncodedKeySpec(privateDER.decodeBase64Bytes())) as ECPrivateKey
+    )
+}
+
+val platformKey256 = makeEcKey(ECDSATests.ecKey256PublicDER, ECDSATests.ecKey256PrivateDER)
+val platformKey384 = makeEcKey(ECDSATests.ecKey384PublicDER, ECDSATests.ecKey384PrivateDER)
+val platformKey521 = makeEcKey(ECDSATests.ecKey521PublicDER, ECDSATests.ecKey521PrivateDER)
 
 class TestECDSA: ECDSATests(
     platformKey256,
     platformKey256,
+    platformKey384,
+    platformKey384,
     platformKey521,
     platformKey521
 ) {
-    @Test
-    override fun testES256Verify() {
-        testES256Verify_()
-    }
 
-    @Test
-    override fun testES512Verify() {
-        testES512Verify_()
-    }
-
-    @Test
-    override fun testSignVerifyLoop(){
-        testSignVerifyLoop_()
-    }
 }
