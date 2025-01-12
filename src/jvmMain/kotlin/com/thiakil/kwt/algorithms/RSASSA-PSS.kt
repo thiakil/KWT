@@ -19,16 +19,19 @@ private val SHAType.mdName get() = when(this) {
     SHAType.SHA256 -> "SHA-256"
     SHAType.SHA384 -> "SHA-384"
     SHAType.SHA512 -> "SHA-512"
+    SHAType.NONE -> throw IllegalArgumentException("NONE is not valid")
 }
 private val SHAType.mfgSpec get() = when(this) {
     SHAType.SHA256 -> MGF1ParameterSpec.SHA256
     SHAType.SHA384 -> MGF1ParameterSpec.SHA384
     SHAType.SHA512 -> MGF1ParameterSpec.SHA512
+    SHAType.NONE -> throw IllegalArgumentException("NONE is not valid")
 }
 private val SHAType.saltLen get() = when(this) {
     SHAType.SHA256 -> 32
     SHAType.SHA384 -> 48
     SHAType.SHA512 -> 64
+    SHAType.NONE -> throw IllegalArgumentException("NONE is not valid")
 }
 
 public sealed class RsassPssBase(override val jwaId: JWS.Id, alg: SHAType): JwsAlgorithm {

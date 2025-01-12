@@ -70,11 +70,13 @@ public sealed class EcdsaBase(override val jwaId: JWS.Id, shaType: SHAType): Jws
         SHAType.SHA256 -> 32
         SHAType.SHA384 -> 48
         SHAType.SHA512 -> 64
+        else -> -1
     }
     private val javaSigAlg = when(shaType) {
         SHAType.SHA256 -> "SHA256withECDSA"
         SHAType.SHA384 -> "SHA384withECDSA"
         SHAType.SHA512 -> "SHA512withECDSA"
+        SHAType.NONE -> "INVALID"
     }
 
     override fun verify(signature: UnverifiedSignature, key: SigningKey): Boolean {

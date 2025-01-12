@@ -17,6 +17,7 @@ public sealed class HmacBase(override val jwaId: JWS.Id, alg: SHAType): JwsAlgor
         SHAType.SHA256 -> "HmacSHA256"
         SHAType.SHA384 -> "HmacSHA384"
         SHAType.SHA512 -> "HmacSHA512"
+        SHAType.NONE -> throw IllegalArgumentException("NONE is not valid")
     }
     override fun verify(signature: UnverifiedSignature, key: SigningKey): Boolean {
         return MessageDigest.isEqual(doMac(key, signature.subject), signature.signature)

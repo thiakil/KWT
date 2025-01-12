@@ -17,6 +17,7 @@ internal class HmacBase(override val jwaId: JWS.Id, alg: SHAType): JwsAlgorithm 
         SHAType.SHA256 -> "sha256"
         SHAType.SHA384 -> "sha384"
         SHAType.SHA512 -> "sha512"
+        SHAType.NONE -> throw IllegalArgumentException("NONE is not valid")
     }
 
     private fun createDigest(data: String, key: SigningKey): ByteArray {

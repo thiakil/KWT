@@ -23,12 +23,14 @@ internal class EcdsaBase(override val jwaId: JWS.Id, shaType: SHAType): JwsAlgor
         SHAType.SHA256 -> "SHA256"
         SHAType.SHA384 -> "SHA384"
         SHAType.SHA512 -> "SHA512"
+        SHAType.NONE -> throw IllegalArgumentException("NONE is not valid")
     }
     /** Size (in bytes) of the R,S integers. Equal to the size of the key */
     private val rsSize: Int = when(shaType) {
         SHAType.SHA256 -> 32
         SHAType.SHA384 -> 48
         SHAType.SHA512 -> 64
+        SHAType.NONE -> throw IllegalArgumentException("NONE is not valid")
     }
     override fun verify(signature: UnverifiedSignature, key: SigningKey): Boolean {
         val publicKey = when(key) {

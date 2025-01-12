@@ -18,6 +18,7 @@ public sealed class RSABase(override val jwaId: JWS.Id, alg: SHAType): JwsAlgori
         SHAType.SHA256 -> "SHA256withRSA"
         SHAType.SHA384 -> "SHA384withRSA"
         SHAType.SHA512 -> "SHA512withRSA"
+        SHAType.NONE -> throw IllegalArgumentException("NONE is not valid")
     }
     override fun verify(signature: UnverifiedSignature, key: SigningKey): Boolean {
         val publicKey = when(key) {

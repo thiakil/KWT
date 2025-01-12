@@ -3,6 +3,7 @@ package com.thiakil.kwt
 import com.thiakil.kwt.algorithms.UnsignedAlg
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 /**
  * RFC 7518 - 3.1.  "alg" (Algorithm) Header Parameter Values for JWS
@@ -43,21 +44,23 @@ import kotlinx.serialization.Serializable
  */
 public object JWS {
     @Serializable
-    public enum class Id {
-        HS256,
-        HS384,
-        HS512,
-        RS256,
-        RS384,
-        RS512,
-        ES256,
-        ES384,
-        ES512,
-        PS256,
-        PS384,
-        PS512,
+    public enum class Id(
+        @Transient public val shaType: SHAType
+    ) {
+        HS256(SHAType.SHA256),
+        HS384(SHAType.SHA384),
+        HS512(SHAType.SHA512),
+        RS256(SHAType.SHA256),
+        RS384(SHAType.SHA384),
+        RS512(SHAType.SHA512),
+        ES256(SHAType.SHA256),
+        ES384(SHAType.SHA384),
+        ES512(SHAType.SHA512),
+        PS256(SHAType.SHA256),
+        PS384(SHAType.SHA384),
+        PS512(SHAType.SHA512),
         @SerialName("none")
-        NONE
+        NONE(SHAType.NONE)
     }
     /**
      * Check if this platform supports this algorithm for signing and verifying
