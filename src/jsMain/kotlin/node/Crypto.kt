@@ -19,6 +19,7 @@ public external interface KeyDef {
     public var key: dynamic
     public var format: String
     public var encoding: String
+    public var type: String
 }
 
 public external class Hmac {

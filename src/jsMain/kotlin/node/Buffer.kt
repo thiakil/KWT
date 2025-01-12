@@ -60,6 +60,15 @@ public external class Buffer : Uint8Array {
     public fun compare(otherBuffer: Buffer): Int
 }
 
+@JsModule("node:buffer")
+public external object NodeBuffer {
+    public val Buffer: BufferStatic
+}
+
+public external object BufferStatic {
+    public fun from(str: String, encoding: String): Buffer
+}
+
 //https://slack-chats.kotlinlang.org/t/14142949/ok-so-the-correct-way-to-transform-a-bytearray-int8array-to-
 public inline fun Uint8Array.toKotlinArray(): ByteArray =
     Int8Array(buffer, byteOffset, byteLength).unsafeCast<ByteArray>()

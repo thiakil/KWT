@@ -2,7 +2,6 @@
 
 package com.thiakil.kwt.algorithms
 
-import com.thiakil.kwt.InvalidSignatureException
 import com.thiakil.kwt.JWS
 import com.thiakil.kwt.JsonWebKey
 import com.thiakil.kwt.JwsAlgorithm
@@ -12,16 +11,16 @@ import com.thiakil.kwt.UnsupportedKeyException
 import com.thiakil.kwt.UnverifiedSignature
 import com.thiakil.kwt.algorithms.ecdsa.convertDERToRaw
 import com.thiakil.kwt.algorithms.ecdsa.convertRawSigToDER
+import com.thiakil.kwt.algorithms.ecdsa.curveOid
 import com.thiakil.kwt.helpers.encodeBase64Url
-import io.ktor.utils.io.core.*
-import kotlinx.io.readByteArray
+import java.lang.IllegalArgumentException
 import java.math.BigInteger
 import java.security.AlgorithmParameters
+import java.security.Key
 import java.security.KeyFactory
-import java.security.PrivateKey
-import java.security.PublicKey
 import java.security.SecureRandom
 import java.security.Signature
+import java.security.interfaces.ECKey
 import java.security.interfaces.ECPrivateKey
 import java.security.interfaces.ECPublicKey
 import java.security.spec.ECGenParameterSpec
@@ -29,9 +28,8 @@ import java.security.spec.ECParameterSpec
 import java.security.spec.ECPoint
 import java.security.spec.ECPrivateKeySpec
 import java.security.spec.ECPublicKeySpec
-import kotlin.math.max
-import kotlin.math.min
 import kotlin.text.toByteArray
+
 
 private val JsonWebKey.EllipticCurve.ecParameterSpec: ECParameterSpec
     get() {
@@ -57,9 +55,19 @@ internal fun JsonWebKey.EllipticCurve.toJavaPublic(): ECPublicKey {
 }
 
 internal fun JsonWebKey.EllipticCurve.toJavaPrivate(): ECPrivateKey {
-    val privateSpec = ECPrivateKeySpec(BigInteger(1, eccPrivateKey!!), ecParameterSpec)
+    val privateSpec = ECPrivateKeySpec(BigInteger(1, eccPrivateKey ?: throw IllegalArgumentException("No private key")), ecParameterSpec)
     val kf = KeyFactory.getInstance("EC")
     return kf.generatePrivate(privateSpec) as ECPrivateKey
+}
+
+private fun curveOid(key: Key): String? {
+    try {
+        val params = AlgorithmParameters.getInstance("EC")
+        params.init((key as ECKey).params)
+        return params.getParameterSpec(ECGenParameterSpec::class.java).name
+    } catch (e: Exception) {
+        return null
+    }
 }
 
 public data class JavaECKey(val publicKey: ECPublicKey? = null, val privateKey: ECPrivateKey? = null): SigningKey
@@ -69,7 +77,7 @@ public sealed class EcdsaBase(override val jwaId: JWS.Id, shaType: SHAType): Jws
     private val rsSize: Int = when(shaType) {
         SHAType.SHA256 -> 32
         SHAType.SHA384 -> 48
-        SHAType.SHA512 -> 64
+        SHAType.SHA512 -> 66
         else -> -1
     }
     private val javaSigAlg = when(shaType) {
@@ -80,9 +88,10 @@ public sealed class EcdsaBase(override val jwaId: JWS.Id, shaType: SHAType): Jws
     }
 
     override fun verify(signature: UnverifiedSignature, key: SigningKey): Boolean {
-        val publicKey: PublicKey = when(key) {
+        val publicKey: ECPublicKey = when(key) {
             is JsonWebKey.EllipticCurve -> key.toJavaPublic()
-            is JavaECKey -> key.publicKey!!
+            is JavaECKey -> key.publicKey ?:
+            throw UnsupportedKeyException("No public key")
             else -> throw UnsupportedKeyException("Unknown key: "+key.javaClass.name)
         }
         val s = Signature.getInstance(javaSigAlg)
@@ -92,10 +101,14 @@ public sealed class EcdsaBase(override val jwaId: JWS.Id, shaType: SHAType): Jws
     }
 
     override fun sign(payload: String, key: SigningKey): String {
-        val privateKey: PrivateKey = when(key) {
+        val privateKey: ECPrivateKey = when(key) {
             is JsonWebKey.EllipticCurve -> key.toJavaPrivate()
-            is JavaECKey -> key.privateKey!!
+            is JavaECKey -> key.privateKey ?: throw UnsupportedKeyException("No private key")
             else -> throw UnsupportedKeyException("Unknown key: "+key.javaClass.name)
+        }
+        val curveOid = curveOid(privateKey)
+        if (curveOid != null && jwaId.curveOid != curveOid) {
+            throw UnsupportedKeyException("Incorrect curve. Expected oid ${jwaId.curveOid} but found $curveOid")
         }
         val s = Signature.getInstance(javaSigAlg)
         s.initSign(privateKey, SecureRandom())

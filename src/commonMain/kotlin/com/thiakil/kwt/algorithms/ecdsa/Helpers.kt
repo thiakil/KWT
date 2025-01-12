@@ -1,18 +1,27 @@
 package com.thiakil.kwt.algorithms.ecdsa
 
 import com.thiakil.kwt.InvalidSignatureException
+import com.thiakil.kwt.JWS
 import io.ktor.utils.io.core.buildPacket
 import io.ktor.utils.io.core.writeFully
 import kotlinx.io.readByteArray
 import kotlin.math.max
 import kotlin.math.min
 
+internal val JWS.Id.curveOid
+    get() = when (this) {
+        JWS.Id.ES256 -> "1.2.840.10045.3.1.7"
+        JWS.Id.ES384 -> "1.3.132.0.34"
+        JWS.Id.ES512 -> "1.3.132.0.35"
+        else -> ""
+    }
+
 /**
  * Converts from raw {R,S} signature format to DER-encoded like Java expects
  */
 internal fun convertRawSigToDER(rawSignature: ByteArray, rsSize: Int): ByteArray {
     if (rawSignature.size != rsSize * 2) {
-        throw InvalidSignatureException("Size mismatch for algorithm")
+        throw InvalidSignatureException("Size mismatch for algorithm. Expected ${rsSize * 2}, got ${rawSignature.size}")
     }
 
     // Retrieve R and S number's length and padding.

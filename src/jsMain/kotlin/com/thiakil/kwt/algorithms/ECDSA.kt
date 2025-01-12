@@ -29,7 +29,7 @@ internal class EcdsaBase(override val jwaId: JWS.Id, shaType: SHAType): JwsAlgor
     private val rsSize: Int = when(shaType) {
         SHAType.SHA256 -> 32
         SHAType.SHA384 -> 48
-        SHAType.SHA512 -> 64
+        SHAType.SHA512 -> 66
         SHAType.NONE -> throw IllegalArgumentException("NONE is not valid")
     }
     override fun verify(signature: UnverifiedSignature, key: SigningKey): Boolean {
@@ -66,7 +66,7 @@ internal class EcdsaBase(override val jwaId: JWS.Id, shaType: SHAType): JwsAlgor
         val expectedCurve = when (jwaId) {
             JWS.Id.ES256 -> "prime256"
             JWS.Id.ES384 -> "prime384"
-            JWS.Id.ES512 -> "prime521"
+            JWS.Id.ES512 -> "secp521r1"
             else -> throw IllegalStateException("Not ECDSA: $jwaId")
         }
         val namedCurve = key.asymmetricKeyDetails?.namedCurve
